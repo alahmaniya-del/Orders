@@ -91,6 +91,18 @@ li.shake{animation:shake .35s}
 @media (prefers-reduced-motion:reduce){li.shake{animation:none}}
 li.unmarked{border-color:var(--err);box-shadow:inset 0 0 0 1px var(--err)}
 li.unmarked .name::after{content:attr(data-miss);display:block;font-size:13px;font-weight:800;color:var(--err);margin-top:2px}
+.hist{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.hist details{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.hist summary{list-style:none;cursor:pointer;display:flex;gap:10px;align-items:center;padding:14px 14px}
+.hist summary::-webkit-details-marker{display:none}
+.hist .when{font-weight:800;flex:1;min-width:0}
+.hist .n{font-size:13px;font-weight:700;color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:3px 10px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.hist .chev{color:var(--muted);transition:transform .15s}
+.hist details[open] .chev{transform:rotate(180deg)}
+.hist ul{gap:0;padding:0 14px 12px}
+.hist li{display:flex;justify-content:space-between;gap:12px;background:none;border:0;border-top:1px solid var(--line);border-radius:0;padding:8px 0}
+.hist li b{font-variant-numeric:tabular-nums;color:var(--accent)}
+.hist .hnote{padding:0 14px 12px;color:var(--muted);font-size:14px}
 li.section{display:block;background:none;border:0;padding:14px 4px 2px;font-family:var(--display);font-size:18px;color:var(--accent)}
 .name{font-weight:600;min-width:0;overflow-wrap:anywhere}
 .target{text-align:center;font-variant-numeric:tabular-nums;color:var(--muted);font-weight:700}
@@ -159,6 +171,7 @@ body.kp-open #supView header{padding-block:4px 6px}
         <span class="spacer"></span>
         <button class="link" id="editBtn" type="button">עריכת יעדים</button>
         <button class="link" id="clearBtn" type="button">ספירה חדשה</button>
+        <button class="link" id="histBtn" type="button">היסטוריה</button>
       </div>
     </header>
 
@@ -175,6 +188,14 @@ body.kp-open #supView header{padding-block:4px 6px}
       <h2>תצוגת ההזמנה</h2>
       <img id="previewImg" alt="תצוגה מקדימה של ההזמנה">
     </div>
+  </section>
+
+  <section id="histView" class="wrap" hidden>
+    <header>
+      <button class="back" id="histBack" type="button">→ חזרה</button>
+      <h1 class="sname" id="histTitle"></h1>
+    </header>
+    <div class="hist" id="histList"></div>
   </section>
 
   <div class="keypad" id="keypad" hidden>
@@ -336,7 +357,7 @@ const T = {
       preparing:"מכין את ההזמנה…", cancelled:"השליחה בוטלה", busy:"חלון כבר פתוח, נסה שוב בעוד רגע", fail:"לא הצלחתי להכין את ההזמנה. נסה שוב.",
       noLib:"לא הצלחתי לטעון את כלי ה-PDF. נסה לרענן את הדף.", noDl:"שליחת קבצים לא זמינה כאן. נסה לפתוח את הדף מחדש.",
       ready:"ההזמנה מוכנה – לחץ לשליחה", tapAgain:"לחץ שוב כדי לפתוח את השיתוף", shareFail:"לא הצלחתי לשתף. נסה שוב.",
-      lblTarget:"יעד ", missRow:"לא סומן – רשום כמות (גם 0)", notMarked:n=>(n===1?"מוצר אחד לא סומן":n+" מוצרים לא סומנו")+". סמן הכול לפני השליחה.", lblLeft:"נשאר במלאי ", lblQty:"כמות להזמנה ", locale:"he-IL", dir:"rtl"},
+      lblTarget:"יעד ", hist:"היסטוריה", histBack:"→ חזרה", histTitle:n=>"היסטוריית הזמנות · "+n, histEmpty:"עוד לא נשלחו הזמנות לספק הזה.", histCount:n=>n+" מוצרים", noteWord:"הערה: ", missRow:"לא סומן – רשום כמות (גם 0)", notMarked:n=>(n===1?"מוצר אחד לא סומן":n+" מוצרים לא סומנו")+". סמן הכול לפני השליחה.", lblLeft:"נשאר במלאי ", lblQty:"כמות להזמנה ", locale:"he-IL", dir:"rtl"},
   fr:{back:"← Fournisseurs", edit:"Modifier les objectifs", editDone:"Terminer", clear:"Nouveau comptage", clearArm:"Appuyez encore pour effacer", cleared:"Comptage effacé",
       cols:["Produit","Objectif","Reste","À commander"], empty:"Aucun produit pour ce fournisseur.",
       noteLabel:"Note pour le fournisseur (facultatif)", notePh:"Ex. : livrer avant 7h00", preview:"Aperçu de la commande", send:"Envoyer la commande",
@@ -346,7 +367,7 @@ const T = {
       preparing:"Préparation de la commande…", cancelled:"Envoi annulé", busy:"Une fenêtre est déjà ouverte, réessayez dans un instant", fail:"Impossible de préparer la commande. Réessayez.",
       noLib:"Impossible de charger l’outil PDF. Rechargez la page.", noDl:"L’envoi de fichiers n’est pas disponible ici. Rouvrez la page.",
       ready:"Commande prête – appuyez pour envoyer", tapAgain:"Appuyez encore pour ouvrir le partage", shareFail:"Partage impossible. Réessayez.",
-      lblTarget:"Objectif ", missRow:"Non renseigné – saisissez une quantité (même 0)", notMarked:n=>(n===1?"1 produit non renseigné":n+" produits non renseignés")+". Complétez tout avant l’envoi.", lblLeft:"Reste en stock ", lblQty:"Quantité à commander ", locale:"fr-FR", dir:"ltr"}
+      lblTarget:"Objectif ", hist:"Historique", histBack:"← Retour", histTitle:n=>"Historique des commandes · "+n, histEmpty:"Aucune commande envoyée pour ce fournisseur.", histCount:n=>n+" produits", noteWord:"Note : ", missRow:"Non renseigné – saisissez une quantité (même 0)", notMarked:n=>(n===1?"1 produit non renseigné":n+" produits non renseignés")+". Complétez tout avant l’envoi.", lblLeft:"Reste en stock ", lblQty:"Quantité à commander ", locale:"fr-FR", dir:"ltr"}
 };
 let L="he";
 const tr = () => T[L];
@@ -358,6 +379,9 @@ function applyLang(){
   document.getElementById("kpEnter").setAttribute("dir",x.dir);
   document.getElementById("backBtn").textContent=x.back;
   document.getElementById("clearBtn").textContent=x.clear;
+  document.getElementById("histBtn").textContent=x.hist;
+  document.getElementById("histBack").textContent=x.histBack;
+  document.getElementById("histView").setAttribute("dir",x.dir);
   document.querySelectorAll("#supView .cols span").forEach((sp,i)=>sp.textContent=x.cols[i]);
   document.getElementById("emptyMsg").textContent=x.empty;
   document.querySelector('label[for="note"]').textContent=x.noteLabel;
@@ -403,7 +427,7 @@ let cur=null, st=null, editing=false;
 
 function showHome(){
   cur=null; editing=false; closeKeypad(); L="he"; applyLang();
-  supView.hidden=true; bar.hidden=true; homeView.hidden=false;
+  supView.hidden=true; bar.hidden=true; homeView.hidden=false; document.getElementById("histView").hidden=true;
   const tiles=document.getElementById("tiles"); tiles.innerHTML="";
   SUPPLIERS.forEach(s=>{
     const b=document.createElement("button"); b.className="tile"; b.type="button";
@@ -632,6 +656,50 @@ async function drawPages(s){
   return out;
 }
 
+// ---------- order history (kept on this phone, newest first)
+let lastSnap=null;
+function snapshotOrder(s){
+  return {ts:Date.now(), items:linesOf(s,st).map(x=>({id:x.p.id,name:x.p.name,q:x.o})), note:(st.day.note||"").trim()};
+}
+function recordOrder(s,snap){
+  if(!snap) return;
+  const k="hl_hist_"+dataKey(s), h=load(k,[]);
+  h.unshift(snap); save(k,h.slice(0,120));
+}
+function showHistory(){
+  closeKeypad();
+  supView.hidden=true; bar.hidden=true; document.getElementById("histView").hidden=false;
+  document.getElementById("histTitle").textContent=tr().histTitle(cur.title||cur.name);
+  const box=document.getElementById("histList"); box.innerHTML="";
+  const h=load("hl_hist_"+dataKey(cur),[]);
+  if(!h.length){ const e=document.createElement("div"); e.className="empty"; e.textContent=tr().histEmpty; box.appendChild(e); }
+  const byId=Object.fromEntries(cur.products.map(p=>[p.id,p]));
+  h.forEach(o=>{
+    const d=document.createElement("details");
+    const sm=document.createElement("summary");
+    const w=document.createElement("span"); w.className="when";
+    w.textContent=new Date(o.ts).toLocaleString(tr().locale,{weekday:"short",day:"numeric",month:"numeric",year:"2-digit",hour:"2-digit",minute:"2-digit"});
+    const n=document.createElement("span"); n.className="n"; n.textContent=tr().histCount(o.items.length);
+    const c=document.createElement("span"); c.className="chev"; c.textContent="▾";
+    sm.append(w,n,c); d.appendChild(sm);
+    const ul=document.createElement("ul");
+    o.items.forEach(it=>{
+      const li=document.createElement("li");
+      const nm=document.createElement("span"); nm.textContent=byId[it.id]?pname(byId[it.id]):it.name;
+      const q=document.createElement("b"); q.textContent=it.q;
+      li.append(nm,q); ul.appendChild(li);
+    });
+    d.appendChild(ul);
+    if(o.note){ const nt=document.createElement("div"); nt.className="hnote"; nt.textContent=tr().noteWord+o.note; d.appendChild(nt); }
+    box.appendChild(d);
+  });
+  window.scrollTo(0,0);
+}
+document.getElementById("histBtn").addEventListener("click",showHistory);
+document.getElementById("histBack").addEventListener("click",()=>{
+  document.getElementById("histView").hidden=true; supView.hidden=false; bar.hidden=false; window.scrollTo(0,0);
+});
+
 function unmarked(){ return cur ? cur.products.filter(p=>!p.section && targetOf(p,st)!=null && String(st.day.vals[p.id] ?? "").trim()==="") : []; }
 document.getElementById("pdfBtn").addEventListener("click",e=>{
   if(!cur) return;
@@ -650,6 +718,7 @@ document.getElementById("pdfBtn").addEventListener("click",e=>{
 
 let pendingFile=null, pendingSup=null;
 function afterSent(s){
+  recordOrder(s,lastSnap); lastSnap=null;
   save("hl_day_"+dataKey(s),{date:todayKey(),vals:{},note:""});
   pendingFile=null; pendingSup=null;
   document.getElementById("pdfBtn").textContent=tr().send;
@@ -692,12 +761,14 @@ document.getElementById("pdfBtn").addEventListener("click",async()=>{
     const pdf=new window.jspdf.jsPDF({unit:"mm",format:"a4"});
     imgs.forEach((im,i)=>{ if(i) pdf.addPage(); pdf.addImage(im,"JPEG",0,0,210,297); });
     const blob=pdf.output("blob");
+    lastSnap=snapshotOrder(s);
     const d=new Date();
     const fname="הזמנה הלחמניא - "+(s.pdfName||s.name).replace(/["״]/g,"")+" "+d.getDate()+"-"+(d.getMonth()+1)+"-"+d.getFullYear()+" "+String(d.getHours()).padStart(2,"0")+"."+String(d.getMinutes()).padStart(2,"0")+".pdf";
     const file=new File([blob],fname,{type:"application/pdf"});
     await shareFile(file,s);
     return;
     // order sent: reset this supplier's count so the next order starts clean
+    recordOrder(s,lastSnap); lastSnap=null;
     save("hl_day_"+dataKey(s),{date:todayKey(),vals:{},note:""});
     if(cur===s){ showHome(); }
   }catch(e){
