@@ -120,8 +120,6 @@ textarea{font:inherit;padding:10px;border:1px solid var(--line);border-radius:10
 .bar-in{max-width:640px;margin:0 auto;display:flex;gap:10px}
 .btn{font:inherit;font-weight:800;font-size:17px;border-radius:10px;padding:13px 16px;border:0;cursor:pointer}
 .primary{flex:1;background:var(--accent);color:var(--accent-ink)}
-.pdf{flex:0 0 auto;min-width:76px;background:var(--accent-soft);color:var(--accent)}
-.pdf:disabled{opacity:.45;cursor:default}
 .primary:disabled{opacity:.45;cursor:default}
 .status{font-size:13px;color:var(--muted);text-align:center;margin-top:6px;min-height:1em}
 .preview{margin-top:22px}
@@ -215,8 +213,7 @@ body.kp-open #supView header{padding-block:4px 6px}
 
   <div class="bar" id="bar" hidden>
     <div class="bar-in">
-      <button class="btn primary" id="sendBtn" type="button">שלח הזמנה</button>
-      <button class="btn pdf" id="pdfBtn" type="button" aria-label="שלח כ-PDF">PDF</button>
+      <button class="btn primary" id="pdfBtn" type="button">שלח הזמנה</button>
     </div>
     <div class="status" id="status" role="status"></div>
   </div>
@@ -360,7 +357,7 @@ const T = {
       preparing:"מכין את ההזמנה…", cancelled:"השליחה בוטלה", busy:"חלון כבר פתוח, נסה שוב בעוד רגע", fail:"לא הצלחתי להכין את ההזמנה. נסה שוב.",
       noLib:"לא הצלחתי לטעון את כלי ה-PDF. נסה לרענן את הדף.", noDl:"שליחת קבצים לא זמינה כאן. נסה לפתוח את הדף מחדש.",
       ready:"ההזמנה מוכנה – לחץ לשליחה", tapAgain:"לחץ שוב כדי לפתוח את השיתוף", shareFail:"לא הצלחתי לשתף. נסה שוב.",
-      lblTarget:"יעד ", copied:"ההזמנה הועתקה – פתח את וואטסאפ והדבק", hist:"היסטוריה", histBack:"→ חזרה", histTitle:n=>"היסטוריית הזמנות · "+n, histEmpty:"עוד לא נשלחו הזמנות לספק הזה.", histCount:n=>n+" מוצרים", noteWord:"הערה: ", missRow:"לא סומן – רשום כמות (גם 0)", notMarked:n=>(n===1?"מוצר אחד לא סומן":n+" מוצרים לא סומנו")+". סמן הכול לפני השליחה.", lblLeft:"נשאר במלאי ", lblQty:"כמות להזמנה ", locale:"he-IL", dir:"rtl"},
+      lblTarget:"יעד ", hist:"היסטוריה", histBack:"→ חזרה", histTitle:n=>"היסטוריית הזמנות · "+n, histEmpty:"עוד לא נשלחו הזמנות לספק הזה.", histCount:n=>n+" מוצרים", noteWord:"הערה: ", missRow:"לא סומן – רשום כמות (גם 0)", notMarked:n=>(n===1?"מוצר אחד לא סומן":n+" מוצרים לא סומנו")+". סמן הכול לפני השליחה.", lblLeft:"נשאר במלאי ", lblQty:"כמות להזמנה ", locale:"he-IL", dir:"rtl"},
   fr:{back:"← Fournisseurs", edit:"Modifier les objectifs", editDone:"Terminer", clear:"Nouveau comptage", clearArm:"Appuyez encore pour effacer", cleared:"Comptage effacé",
       cols:["Produit","Objectif","Reste","À commander"], empty:"Aucun produit pour ce fournisseur.",
       noteLabel:"Note pour le fournisseur (facultatif)", notePh:"Ex. : livrer avant 7h00", preview:"Aperçu de la commande", send:"Envoyer la commande",
@@ -370,7 +367,7 @@ const T = {
       preparing:"Préparation de la commande…", cancelled:"Envoi annulé", busy:"Une fenêtre est déjà ouverte, réessayez dans un instant", fail:"Impossible de préparer la commande. Réessayez.",
       noLib:"Impossible de charger l’outil PDF. Rechargez la page.", noDl:"L’envoi de fichiers n’est pas disponible ici. Rouvrez la page.",
       ready:"Commande prête – appuyez pour envoyer", tapAgain:"Appuyez encore pour ouvrir le partage", shareFail:"Partage impossible. Réessayez.",
-      lblTarget:"Objectif ", copied:"Commande copiée – ouvrez WhatsApp et collez-la", hist:"Historique", histBack:"← Retour", histTitle:n=>"Historique des commandes · "+n, histEmpty:"Aucune commande envoyée pour ce fournisseur.", histCount:n=>n+" produits", noteWord:"Note : ", missRow:"Non renseigné – saisissez une quantité (même 0)", notMarked:n=>(n===1?"1 produit non renseigné":n+" produits non renseignés")+". Complétez tout avant l’envoi.", lblLeft:"Reste en stock ", lblQty:"Quantité à commander ", locale:"fr-FR", dir:"ltr"}
+      lblTarget:"Objectif ", hist:"Historique", histBack:"← Retour", histTitle:n=>"Historique des commandes · "+n, histEmpty:"Aucune commande envoyée pour ce fournisseur.", histCount:n=>n+" produits", noteWord:"Note : ", missRow:"Non renseigné – saisissez une quantité (même 0)", notMarked:n=>(n===1?"1 produit non renseigné":n+" produits non renseignés")+". Complétez tout avant l’envoi.", lblLeft:"Reste en stock ", lblQty:"Quantité à commander ", locale:"fr-FR", dir:"ltr"}
 };
 let L="he";
 const tr = () => T[L];
@@ -390,7 +387,7 @@ function applyLang(){
   document.querySelector('label[for="note"]').textContent=x.noteLabel;
   document.getElementById("note").placeholder=x.notePh;
   document.querySelector("#previewBox h2").textContent=x.preview;
-  document.getElementById("sendBtn").textContent=x.send;
+  document.getElementById("pdfBtn").textContent=x.send;
   document.querySelector(".kp-close").textContent=x.close;
 }
 
@@ -577,7 +574,6 @@ function summary(){
   const overN=cur.products.filter(p=>{const t=targetOf(p,st),v=num(st.day.vals[p.id]);return t!=null&&v!=null&&v>t;}).length;
   const oe=document.getElementById("overPill"); oe.hidden=overN===0; oe.textContent=tr().errors(overN);
   document.getElementById("pdfBtn").disabled = n===0 && unmarked().length===0;
-  document.getElementById("sendBtn").disabled = n===0 && unmarked().length===0;
 }
 
 document.getElementById("backBtn").addEventListener("click",showHome);
@@ -705,11 +701,11 @@ document.getElementById("histBack").addEventListener("click",()=>{
 });
 
 function unmarked(){ return cur ? cur.products.filter(p=>!p.section && targetOf(p,st)!=null && String(st.day.vals[p.id] ?? "").trim()==="") : []; }
-function guardMarked(e){
-  if(!cur) return false;
+document.getElementById("pdfBtn").addEventListener("click",e=>{
+  if(!cur) return;
   const miss=unmarked();
-  if(!miss.length) return false;
-  e.preventDefault(); e.stopImmediatePropagation();
+  if(!miss.length) return;
+  e.stopImmediatePropagation();
   miss.forEach(p=>{ const li=list.querySelector('li[data-id="'+p.id+'"]'); if(li) li.classList.add("unmarked"); });
   const first=list.querySelector('li[data-id="'+miss[0].id+'"]');
   setStatus(tr().notMarked(miss.length));
@@ -718,43 +714,14 @@ function guardMarked(e){
     const inp=first.querySelector('input[id^="v_"]'); if(inp) inp.focus();
   }
   try{ navigator.vibrate && navigator.vibrate(150); }catch(_){}
-  return true;
-}
-document.getElementById("pdfBtn").addEventListener("click",guardMarked,true);
-
-// ---------- "שלח הזמנה": share the order as a tidy text list (always Hebrew, like the PDF)
-function orderText(s){
-  const d=new Date();
-  let t="*הזמנה – "+BUSINESS+"*\nסניף ראשון לציון, יוסף לישנסקי 17\nלכבוד: "+(s.pdfName||s.name)+"\n"+d.toLocaleDateString("he-IL")+"  "+fmtTime(d)+"\n\n";
-  linesOf(s,st).forEach((x,i)=>{ t+=(i+1)+". "+x.p.name+" – *"+x.o+"*\n"; });
-  if((st.day.note||"").trim()) t+="\nהערה: "+st.day.note.trim()+"\n";
-  return t+"\nתודה!";
-}
-function finishSent(s,snap){
-  recordOrder(s,snap);
-  save("hl_day_"+dataKey(s),{date:todayKey(),vals:{},note:""});
-  if(cur===s) showHome();
-}
-const sendBtn=document.getElementById("sendBtn");
-sendBtn.addEventListener("click",guardMarked,true);
-sendBtn.addEventListener("click",async()=>{
-  const s=cur; if(!s || linesOf(s,st).length===0) return;
-  const text=orderText(s), snap=snapshotOrder(s);
-  if(navigator.share){
-    try{ await navigator.share({text}); finishSent(s,snap); return; }
-    catch(e){ if(e && e.name==="AbortError"){ setStatus(tr().cancelled); return; } }
-  }
-  // no share sheet here: copy the list so it can be pasted into WhatsApp
-  try{ await navigator.clipboard.writeText(text); setStatus(tr().copied); }
-  catch(_){ setStatus(tr().shareFail); }
-});
+},true);
 
 let pendingFile=null, pendingSup=null;
 function afterSent(s){
   recordOrder(s,lastSnap); lastSnap=null;
   save("hl_day_"+dataKey(s),{date:todayKey(),vals:{},note:""});
   pendingFile=null; pendingSup=null;
-  document.getElementById("pdfBtn").textContent="PDF";
+  document.getElementById("pdfBtn").textContent=tr().send;
   if(cur===s) showHome();
 }
 async function shareFile(file,s){
@@ -765,7 +732,7 @@ async function shareFile(file,s){
     }catch(e){
       if(e && e.name==="NotAllowedError"){
         pendingFile=file; pendingSup=s;
-        document.getElementById("pdfBtn").textContent="PDF ↗";
+        document.getElementById("pdfBtn").textContent=tr().ready;
         setStatus(tr().tapAgain);
       } else if(e && e.name==="AbortError"){ setStatus(tr().cancelled); }
       else setStatus(tr().shareFail);
