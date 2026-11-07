@@ -193,6 +193,9 @@ li.addrow button:focus-visible{outline:2px solid var(--accent)}
 .dlg-yes{flex:1;color:#fff}
 .dlg.del .dlg-yes{background:var(--err)}
 .dlg.hide .dlg-yes{background:#8c8a84}
+.hreset{margin-top:28px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.hreset-btn{font:inherit;font-weight:800;font-size:15px;color:var(--err);background:none;border:1.5px solid var(--err);border-radius:10px;padding:10px 18px;cursor:pointer}
+.hreset .pin-ask{width:100%;box-sizing:border-box}
 .dlg-no{background:var(--bg);color:var(--ink)}
 li.noname input.namein{border-color:var(--err);box-shadow:0 0 0 3px color-mix(in srgb,var(--err) 20%,transparent)}
 li.noname .name::after{content:attr(data-noname);display:block;font-size:13px;font-weight:800;color:var(--err);margin-top:4px}
@@ -327,6 +330,17 @@ body.kp-open #supView header{padding-block:4px 6px}
       <h1 class="sname" id="histTitle"></h1>
     </header>
     <div class="hist" id="histList"></div>
+    <div class="hreset">
+      <button type="button" class="hreset-btn" id="histResetBtn">אפס היסטוריה</button>
+      <div class="pin-ask" id="hrPin" hidden>
+        <label for="hrPinIn" id="hrPinQ">הקלד קוד</label>
+        <div class="pin-row">
+          <input id="hrPinIn" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off">
+          <button type="button" class="ca-no" id="hrPinNo">ביטול</button>
+        </div>
+        <div class="pin-err" id="hrPinErr" role="alert"></div>
+      </div>
+    </div>
   </section>
 
   <div class="dlg-back" id="dlg" hidden>
@@ -484,7 +498,8 @@ const SUPPLIERS = [
     ["r6","כורכום",1],
     ["r8","פרורי לחם",50],
     ["r9","לימון משומר",4],
-    ["r11","פלפל שחור גרוס",2]
+    ["r11","פלפל שחור גרוס",2],
+    ["r12","מיונז HILDA 5 ק\"ג",5]
   ]}
 ].map(s=>({...s, products:s.products.map(([id,name,target])=>target==="§"?{id,name,target:null,section:true}:{id,name,target})}));
 
@@ -503,6 +518,8 @@ const dataKey = s => s.base || s.id;
 
 // unit prices before VAT, from supplier invoices
 const PRICES = {
+  c1:104.42, c2:94.94, c3:94.94, c4:40.47, c5:92.82, c6:54.54, c7:69.03, c8:69.03, c9:72.9, c10:69.68, c12:115.61,
+  r1:142.5, r2:78, r3:96, r4:132, r5:85.2, r6:126, r8:53, r9:28.6, r11:204, r12:44,
   z1:109, z2:289, z7:81, z8:23.5, z9:110, z10:125, z11:49, z12:89,
   o1:178, o2:155, o7:9.9, o9:92, o11:14, o13:12.5, o14:114, o15:60, o16:3.7, o18:27, o19:12, o28:148, o29:90, o31:78, o32:12, o35:125, o36:276, o37:192, o38:157, o39:276, o40:159
 };
@@ -528,7 +545,7 @@ const T = {
       preparing:"מכין את ההזמנה…", cancelled:"השליחה בוטלה", busy:"חלון כבר פתוח, נסה שוב בעוד רגע", fail:"לא הצלחתי להכין את ההזמנה. נסה שוב.",
       noLib:"לא הצלחתי לטעון את כלי ה-PDF. נסה לרענן את הדף.", noDl:"שליחת קבצים לא זמינה כאן. נסה לפתוח את הדף מחדש.",
       ready:"ההזמנה מוכנה – לחץ לשליחה", tapAgain:"לחץ שוב כדי לפתוח את השיתוף", shareFail:"לא הצלחתי לשתף. נסה שוב.",
-      lblTarget:"יעד ", noPrice:"חסר מחיר", del:"מחק", dlgDelQ:"אתה בטוח למחוק מוצר זה?", dlgHideQ:"אתה בטוח להסתיר מוצר זה?", dlgDelYes:"כן, מחק", dlgHideYes:"כן, הסתר", dlgNo:"ביטול", hide:"הסתר", show:"הצג", actsCol:"פעולות", deleted:n=>"המוצר \""+n+"\" נמחק", nameLbl:"שם המוצר", nameReq:"חובה לתת שם למוצר החדש", addProd:"+ הוסף מוצר", newProd:"מוצר חדש", updPrice:"עדכן מחיר", priceLbl:"מחיר ₪", editFinish:"סיים עריכה", pinQ:"הקלד קוד", pinWrong:"קוד שגוי, נסה שוב", pinNo:"ביטול", oaTitle:"חרגת מההזמנה הקודמת ב:", monthLine:(m,v)=>"לאחר הזמנה זו, סה״כ חודש "+m+": "+money(v), monthUp:(m,v,d)=>"יותר מחודש "+m+" ("+money(v)+") ב-"+money(d), monthDown:(m,v,d)=>"פחות מחודש "+m+" ("+money(v)+") ב-"+money(d), monthSame:m=>"בדיוק כמו חודש "+m, monthNone:m=>"אין עדיין נתונים לחודש "+m, gaTitle:"כל הכבוד! הוזלת מההזמנה הקודמת ב:", oaTitleU:"הזמנת יותר מההזמנה הקודמת ב:", gaTitleU:"כל הכבוד! הזמנת פחות מההזמנה הקודמת ב:", unitsN:n=>n+" יחידות", oaDetailU:(p,n)=>"הקודמת: "+p+" יח׳  ·  עכשיו: "+n+" יח׳", gaYes:"שלח הזמנה", gaNo:"חזרה", oaAmount:d=>money(d), oaDetail:(prev,now)=>"הקודמת: "+money(prev)+"  ·  עכשיו: "+money(now)+"  (לפני מע״מ)", oaYes:"אשר ושלח", oaNo:"ביטול", oaCancelled:"השליחה בוטלה – אפשר לתקן את הכמויות", smart:"הזמנה חכמה", smartArm:"לחץ שוב למילוי", smartFull:"עוד אין היסטוריה לספק הזה – מולאה הזמנה מלאה לפי היעדים. בדוק ותקן לפני השליחה.", smartDone:n=>"מולא לפי ממוצע "+(n===1?"ההזמנה האחרונה":n+" ההזמנות האחרונות")+". בדוק ותקן לפני השליחה.", totalLbl:"סה״כ הזמנה · לפני מע״מ", perUnit:"ליח׳", noPriceN:n=>(n===1?"מוצר אחד":n+" מוצרים")+" בלי מחיר – לא נכללים בסכום", histTotal:"סה״כ לפני מע״מ", monthSoFar:(n,t,g)=>["סיכום עד כה: "+money(t)+" לפני מע״מ","כולל מע״מ: "+money(g)+"  ·  "+n+(n===1?" הזמנה":" הזמנות")], monthCount:n=>n+(n===1?" הזמנה":" הזמנות")+" החודש", vatLbl:"מע״מ 18%", grandLbl:"סה״כ כולל מע״מ", hist:"היסטוריה", histBack:"→ חזרה", histTitle:n=>"היסטוריית הזמנות · "+n, histEmpty:"עוד לא נשלחו הזמנות לספק הזה.", histCount:n=>n+" מוצרים", noteWord:"הערה: ", missRow:"לא סומן – רשום כמות (גם 0)", notMarked:n=>(n===1?"מוצר אחד לא סומן":n+" מוצרים לא סומנו")+". סמן הכול לפני השליחה.", lblLeft:"נשאר במלאי ", lblQty:"כמות להזמנה ", locale:"he-IL", dir:"rtl"},
+      lblTarget:"יעד ", noPrice:"חסר מחיר", del:"מחק", dlgDelQ:"אתה בטוח למחוק מוצר זה?", dlgHideQ:"אתה בטוח להסתיר מוצר זה?", dlgDelYes:"כן, מחק", dlgHideYes:"כן, הסתר", dlgNo:"ביטול", hide:"הסתר", show:"הצג", actsCol:"פעולות", deleted:n=>"המוצר \""+n+"\" נמחק", nameLbl:"שם המוצר", nameReq:"חובה לתת שם למוצר החדש", addProd:"+ הוסף מוצר", newProd:"מוצר חדש", updPrice:"עדכן מחיר", priceLbl:"מחיר ₪", editFinish:"סיים עריכה", pinQ:"הקלד קוד", pinWrong:"קוד שגוי, נסה שוב", pinNo:"ביטול", oaTitle:"חרגת מההזמנה הקודמת ב:", monthLine:(m,v)=>"לאחר הזמנה זו, סה״כ חודש "+m+": "+money(v), monthUp:(m,v,d)=>"יותר מחודש "+m+" ("+money(v)+") ב-"+money(d), monthDown:(m,v,d)=>"פחות מחודש "+m+" ("+money(v)+") ב-"+money(d), monthSame:m=>"בדיוק כמו חודש "+m, monthNone:m=>"אין עדיין נתונים לחודש "+m, gaTitle:"כל הכבוד! הוזלת מההזמנה הקודמת ב:", oaTitleU:"הזמנת יותר מההזמנה הקודמת ב:", gaTitleU:"כל הכבוד! הזמנת פחות מההזמנה הקודמת ב:", unitsN:n=>n+" יחידות", oaDetailU:(p,n)=>"הקודמת: "+p+" יח׳  ·  עכשיו: "+n+" יח׳", gaYes:"שלח הזמנה", gaNo:"חזרה", oaAmount:d=>money(d), oaDetail:(prev,now)=>"הקודמת: "+money(prev)+"  ·  עכשיו: "+money(now)+"  (לפני מע״מ)", oaYes:"אשר ושלח", oaNo:"ביטול", oaCancelled:"השליחה בוטלה – אפשר לתקן את הכמויות", smart:"הזמנה חכמה", smartArm:"לחץ שוב למילוי", smartFull:"עוד אין היסטוריה לספק הזה – מולאה הזמנה מלאה לפי היעדים. בדוק ותקן לפני השליחה.", smartDone:n=>"מולא לפי ממוצע "+(n===1?"ההזמנה האחרונה":n+" ההזמנות האחרונות")+". בדוק ותקן לפני השליחה.", totalLbl:"סה״כ הזמנה · לפני מע״מ", perUnit:"ליח׳", noPriceN:n=>(n===1?"מוצר אחד":n+" מוצרים")+" בלי מחיר – לא נכללים בסכום", histTotal:"סה״כ לפני מע״מ", monthSoFar:(n,t,g)=>["סיכום עד כה: "+money(t)+" לפני מע״מ","כולל מע״מ: "+money(g)+"  ·  "+n+(n===1?" הזמנה":" הזמנות")], monthCount:n=>n+(n===1?" הזמנה":" הזמנות")+" החודש", vatLbl:"מע״מ 18%", grandLbl:"סה״כ כולל מע״מ", hist:"היסטוריה", histBack:"→ חזרה", histTitle:n=>"היסטוריית הזמנות · "+n, histEmpty:"עוד לא נשלחו הזמנות לספק הזה.", histReset:"אפס היסטוריה", histResetQ:"לאפס את כל ההיסטוריה של הספק?", histResetYes:"כן, אפס", histCount:n=>n+" מוצרים", noteWord:"הערה: ", missRow:"לא סומן – רשום כמות (גם 0)", notMarked:n=>(n===1?"מוצר אחד לא סומן":n+" מוצרים לא סומנו")+". סמן הכול לפני השליחה.", lblLeft:"נשאר במלאי ", lblQty:"כמות להזמנה ", locale:"he-IL", dir:"rtl"},
   fr:{back:"← Fournisseurs", edit:"Modifier", editDone:"Terminer", clear:"Effacer la commande", clearQ:"Effacer toute la commande ?", clearYes:"Oui, effacer", clearNo:"Annuler", cleared:"Commande effacée",
       cols:["Produit","Objectif","Reste","À commander"], empty:"Aucun produit pour ce fournisseur.",
       noteLabel:"Note pour le fournisseur (facultatif)", notePh:"Ex. : livrer avant 7h00", preview:"Aperçu de la commande", send:"Envoyer la commande",
@@ -538,7 +555,7 @@ const T = {
       preparing:"Préparation de la commande…", cancelled:"Envoi annulé", busy:"Une fenêtre est déjà ouverte, réessayez dans un instant", fail:"Impossible de préparer la commande. Réessayez.",
       noLib:"Impossible de charger l’outil PDF. Rechargez la page.", noDl:"L’envoi de fichiers n’est pas disponible ici. Rouvrez la page.",
       ready:"Commande prête – appuyez pour envoyer", tapAgain:"Appuyez encore pour ouvrir le partage", shareFail:"Partage impossible. Réessayez.",
-      lblTarget:"Objectif ", noPrice:"Prix manquant", del:"Suppr.", dlgDelQ:"Supprimer ce produit ?", dlgHideQ:"Masquer ce produit ?", dlgDelYes:"Oui, supprimer", dlgHideYes:"Oui, masquer", dlgNo:"Annuler", hide:"Masquer", show:"Afficher", actsCol:"Actions", deleted:n=>"Produit « "+n+" » supprimé", nameLbl:"Nom du produit", nameReq:"Donnez un nom au nouveau produit", addProd:"+ Ajouter un produit", newProd:"Nouveau produit", updPrice:"Modifier le prix", priceLbl:"Prix ₪", editFinish:"Terminer la modification", pinQ:"Entrez le code", pinWrong:"Code incorrect, réessayez", pinNo:"Annuler", oaTitle:"Dépassement par rapport à la commande précédente :", monthLine:(m,v)=>"Après cette commande, total de "+m+" : "+money(v), monthUp:(m,v,d)=>"Plus que "+m+" ("+money(v)+") de "+money(d), monthDown:(m,v,d)=>"Moins que "+m+" ("+money(v)+") de "+money(d), monthSame:m=>"Identique à "+m, monthNone:m=>"Pas encore de données pour "+m, gaTitle:"Bravo ! Économie par rapport à la commande précédente :", oaTitleU:"Plus que la commande précédente :", gaTitleU:"Bravo ! Moins que la commande précédente :", unitsN:n=>n+" unités", oaDetailU:(p,n)=>"Précédente : "+p+" u.  ·  Actuelle : "+n+" u.", gaYes:"Envoyer la commande", gaNo:"Retour", oaAmount:d=>money(d), oaDetail:(prev,now)=>"Précédente : "+money(prev)+"  ·  Actuelle : "+money(now)+"  (HT)", oaYes:"Confirmer et envoyer", oaNo:"Annuler", oaCancelled:"Envoi annulé – vous pouvez corriger les quantités", smart:"Commande intelligente", smartArm:"Appuyez encore pour remplir", smartFull:"Pas encore d’historique – commande complète selon les objectifs. Vérifiez avant l’envoi.", smartDone:n=>"Rempli selon la moyenne des "+n+" dernières commandes. Vérifiez avant l’envoi.", totalLbl:"Total commande · HT", perUnit:"/u", noPriceN:n=>n+" produit(s) sans prix – non inclus", histTotal:"Total HT", monthSoFar:(n,t,g)=>["Total à ce jour : "+money(t)+" HT","TTC : "+money(g)+"  ·  "+n+" commande(s)"], monthCount:n=>n+" commande(s)", vatLbl:"TVA 18 %", grandLbl:"Total TTC", hist:"Historique", histBack:"← Retour", histTitle:n=>"Historique des commandes · "+n, histEmpty:"Aucune commande envoyée pour ce fournisseur.", histCount:n=>n+" produits", noteWord:"Note : ", missRow:"Non renseigné – saisissez une quantité (même 0)", notMarked:n=>(n===1?"1 produit non renseigné":n+" produits non renseignés")+". Complétez tout avant l’envoi.", lblLeft:"Reste en stock ", lblQty:"Quantité à commander ", locale:"fr-FR", dir:"ltr"}
+      lblTarget:"Objectif ", noPrice:"Prix manquant", del:"Suppr.", dlgDelQ:"Supprimer ce produit ?", dlgHideQ:"Masquer ce produit ?", dlgDelYes:"Oui, supprimer", dlgHideYes:"Oui, masquer", dlgNo:"Annuler", hide:"Masquer", show:"Afficher", actsCol:"Actions", deleted:n=>"Produit « "+n+" » supprimé", nameLbl:"Nom du produit", nameReq:"Donnez un nom au nouveau produit", addProd:"+ Ajouter un produit", newProd:"Nouveau produit", updPrice:"Modifier le prix", priceLbl:"Prix ₪", editFinish:"Terminer la modification", pinQ:"Entrez le code", pinWrong:"Code incorrect, réessayez", pinNo:"Annuler", oaTitle:"Dépassement par rapport à la commande précédente :", monthLine:(m,v)=>"Après cette commande, total de "+m+" : "+money(v), monthUp:(m,v,d)=>"Plus que "+m+" ("+money(v)+") de "+money(d), monthDown:(m,v,d)=>"Moins que "+m+" ("+money(v)+") de "+money(d), monthSame:m=>"Identique à "+m, monthNone:m=>"Pas encore de données pour "+m, gaTitle:"Bravo ! Économie par rapport à la commande précédente :", oaTitleU:"Plus que la commande précédente :", gaTitleU:"Bravo ! Moins que la commande précédente :", unitsN:n=>n+" unités", oaDetailU:(p,n)=>"Précédente : "+p+" u.  ·  Actuelle : "+n+" u.", gaYes:"Envoyer la commande", gaNo:"Retour", oaAmount:d=>money(d), oaDetail:(prev,now)=>"Précédente : "+money(prev)+"  ·  Actuelle : "+money(now)+"  (HT)", oaYes:"Confirmer et envoyer", oaNo:"Annuler", oaCancelled:"Envoi annulé – vous pouvez corriger les quantités", smart:"Commande intelligente", smartArm:"Appuyez encore pour remplir", smartFull:"Pas encore d’historique – commande complète selon les objectifs. Vérifiez avant l’envoi.", smartDone:n=>"Rempli selon la moyenne des "+n+" dernières commandes. Vérifiez avant l’envoi.", totalLbl:"Total commande · HT", perUnit:"/u", noPriceN:n=>n+" produit(s) sans prix – non inclus", histTotal:"Total HT", monthSoFar:(n,t,g)=>["Total à ce jour : "+money(t)+" HT","TTC : "+money(g)+"  ·  "+n+" commande(s)"], monthCount:n=>n+" commande(s)", vatLbl:"TVA 18 %", grandLbl:"Total TTC", hist:"Historique", histBack:"← Retour", histTitle:n=>"Historique des commandes · "+n, histEmpty:"Aucune commande envoyée pour ce fournisseur.", histReset:"Réinitialiser l’historique", histResetQ:"Effacer tout l’historique de ce fournisseur ?", histResetYes:"Oui, effacer", histCount:n=>n+" produits", noteWord:"Note : ", missRow:"Non renseigné – saisissez une quantité (même 0)", notMarked:n=>(n===1?"1 produit non renseigné":n+" produits non renseignés")+". Complétez tout avant l’envoi.", lblLeft:"Reste en stock ", lblQty:"Quantité à commander ", locale:"fr-FR", dir:"ltr"}
 };
 let L="he";
 const tr = () => T[L];
@@ -570,7 +587,7 @@ const load = (k,f)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):
 const save = (k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){} try{syncMark(k)}catch(e){}};
 // shared between all phones: order history, targets, prices, names, added / hidden / removed products
 var SYNC_DB="https://halechmania-orders-default-rtdb.europe-west1.firebasedatabase.app/shops/halechmania-rishon";
-var syncRe=/^hl_(hist|targets|prices|names|extra|hidden|removed)_/;
+var syncRe=/^hl_(hist|histreset|targets|prices|names|extra|hidden|removed)_/;
 function syncGet(k,f){try{const v=localStorage.getItem(k);return v?JSON.parse(v):f}catch(e){return f}}
 function syncPut(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 function syncMark(k){
@@ -590,7 +607,10 @@ async function syncFlush(){
         let r;
         if(k.startsWith("hl_hist_")){
           const obj={}; syncGet(k,[]).forEach(o=>{ if(o && o.ts) obj["t"+o.ts]=JSON.stringify(o); });
-          if(!Object.keys(obj).length){ done[k]=pend[k]; continue; }
+          if(!Object.keys(obj).length){
+            r=await fetch(SYNC_DB+"/hist/"+k+".json",{method:"DELETE"});
+            if(r.ok) done[k]=pend[k]; continue;
+          }
           r=await fetch(SYNC_DB+"/hist/"+k+".json",{method:"PATCH",body:JSON.stringify(obj)});
         } else {
           r=await fetch(SYNC_DB+"/set/"+k+".json",{method:"PUT",body:JSON.stringify({v:localStorage.getItem(k)||"null",t:meta[k]||pend[k]})});
@@ -627,11 +647,12 @@ async function syncPull(){
   const hkeys=new Set(Object.keys(hist).filter(k=>k.startsWith("hl_hist_")));
   Object.keys(localStorage).forEach(k=>{ if(k.startsWith("hl_hist_")) hkeys.add(k); });
   hkeys.forEach(k=>{
+    const cut=Number(syncGet("hl_histreset_"+k.slice(8),0))||0;
     const local=syncGet(k,[]), byTs={};
     const remote=hist[k]||{};
-    Object.keys(remote).forEach(id=>{ try{ const o=JSON.parse(remote[id]); if(o && o.ts) byTs[o.ts]=o; }catch(e){} });
+    Object.keys(remote).forEach(id=>{ try{ const o=JSON.parse(remote[id]); if(o && o.ts && o.ts>cut) byTs[o.ts]=o; }catch(e){} });
     let extra=false;
-    local.forEach(o=>{ if(o && o.ts && !byTs[o.ts]){ byTs[o.ts]=o; extra=true; } });
+    local.forEach(o=>{ if(o && o.ts && o.ts>cut && !byTs[o.ts]){ byTs[o.ts]=o; extra=true; } });
     if(extra && !pend[k]) pend[k]=Date.now();
     const merged=Object.values(byTs).sort((a,b)=>b.ts-a.ts).slice(0,120);
     if(JSON.stringify(merged)!==JSON.stringify(local)){ syncPut(k,merged); changed=true; }
@@ -949,24 +970,25 @@ document.getElementById("backBtn").addEventListener("click",showHome);
 const note=document.getElementById("note");
 note.addEventListener("input",()=>{ st.day.note=note.value; saveDay(); });
 // ---------- target editing is locked with a code (unlocked until the app is closed)
-const EDIT_PIN="1111";
-let pinOk=false;
+const EDIT_PIN="1209";
+let pinOk=false, pinFor="editBtn";
 const pinAsk=document.getElementById("pinAsk"), pinIn=document.getElementById("pinIn");
-document.getElementById("editBtn").addEventListener("click",e=>{
-  if(editing || pinOk) return;
+// editing and history are both locked with the code
+["editBtn","histBtn"].forEach(id=>document.getElementById(id).addEventListener("click",e=>{
+  if(pinOk || (id==="editBtn" && editing)) return;
   e.stopImmediatePropagation();
-  closeKeypad();
+  closeKeypad(); pinFor=id;
   document.getElementById("pinQ").textContent=tr().pinQ;
   document.getElementById("pinNo").textContent=tr().pinNo;
   document.getElementById("pinErr").textContent="";
   pinIn.value=""; pinAsk.hidden=false; pinIn.focus();
-},true);
+},true));
 pinIn.addEventListener("input",()=>{
   pinIn.value=pinIn.value.replace(/\D/g,"").slice(0,4);
   if(pinIn.value.length<4) return;
   if(pinIn.value===EDIT_PIN){
     pinOk=true; pinAsk.hidden=true; pinIn.blur();
-    document.getElementById("editBtn").click();
+    document.getElementById(pinFor).click();
   } else {
     document.getElementById("pinErr").textContent=tr().pinWrong;
     pinIn.value="";
@@ -976,7 +998,7 @@ pinIn.addEventListener("input",()=>{
 });
 document.getElementById("editDoneBtn").addEventListener("click",()=>{ if(editing){ document.getElementById("editBtn").click(); window.scrollTo(0,0); } });
 document.getElementById("pinNo").addEventListener("click",()=>{ pinAsk.hidden=true; pinIn.blur(); });
-document.getElementById("editBtn").addEventListener("click",e=>{ editing=!editing; e.target.textContent=editing?tr().editDone:tr().edit; render(); });
+document.getElementById("editBtn").addEventListener("click",e=>{ editing=!editing; if(!editing) pinOk=false; e.target.textContent=editing?tr().editDone:tr().edit; render(); });
 const clearBtn=document.getElementById("clearBtn"), clearAsk=document.getElementById("clearAsk");
 clearBtn.addEventListener("click",()=>{
   closeKeypad();
@@ -1129,9 +1151,37 @@ function showHistory(){
     if(o.note){ const nt=document.createElement("div"); nt.className="hnote"; nt.textContent=tr().noteWord+o.note; d.appendChild(nt); }
     box.appendChild(d);
   });
+  hrUpdate();
   window.scrollTo(0,0);
 }
 document.getElementById("histBtn").addEventListener("click",showHistory);
+// ---------- reset one supplier's history: code, then confirmation (all phones)
+const hrPin=document.getElementById("hrPin"), hrPinIn=document.getElementById("hrPinIn"), hrBtn=document.getElementById("histResetBtn");
+function hrUpdate(){ hrBtn.textContent=tr().histReset; hrBtn.hidden = !cur || !load("hl_hist_"+dataKey(cur),[]).length; hrPin.hidden=true; }
+hrBtn.addEventListener("click",()=>{
+  document.getElementById("hrPinQ").textContent=tr().pinQ; document.getElementById("hrPinNo").textContent=tr().pinNo;
+  document.getElementById("hrPinErr").textContent=""; hrPinIn.value=""; hrBtn.hidden=true; hrPin.hidden=false; hrPinIn.focus();
+});
+document.getElementById("hrPinNo").addEventListener("click",()=>{ hrPinIn.blur(); hrUpdate(); });
+hrPinIn.addEventListener("input",()=>{
+  hrPinIn.value=hrPinIn.value.replace(/\D/g,"").slice(0,4);
+  if(hrPinIn.value.length<4) return;
+  if(hrPinIn.value===EDIT_PIN){
+    hrPinIn.blur(); hrPin.hidden=true;
+    const x=tr(), box=document.querySelector("#dlg .dlg"); box.className="dlg del";
+    document.getElementById("dlgQ").textContent=x.histResetQ;
+    document.getElementById("dlgName").textContent=cur.title||cur.name;
+    document.getElementById("dlgYes").textContent=x.histResetYes;
+    document.getElementById("dlgNo").textContent=x.dlgNo;
+    document.getElementById("dlg").setAttribute("dir",x.dir);
+    dlgAction=()=>{ const k=dataKey(cur); save("hl_histreset_"+k,Date.now()); save("hl_hist_"+k,[]); showHistory(); };
+    document.getElementById("dlg").hidden=false;
+    document.getElementById("dlgNo").addEventListener("click",hrUpdate,{once:true});
+  } else {
+    document.getElementById("hrPinErr").textContent=tr().pinWrong; hrPinIn.value="";
+    hrPin.classList.remove("shake"); void hrPin.offsetWidth; hrPin.classList.add("shake");
+  }
+});
 document.getElementById("histBack").addEventListener("click",()=>{
   document.getElementById("histView").hidden=true; supView.hidden=false; bar.hidden=false; window.scrollTo(0,0);
 });
