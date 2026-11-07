@@ -567,7 +567,91 @@ function applyLang(){
 const todayKey = () => { const d=new Date(); return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate(); };
 const fmtDate = d => d.toLocaleDateString("he-IL",{weekday:"long",day:"numeric",month:"numeric",year:"numeric"});
 const load = (k,f)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):f}catch(e){return f}};
-const save = (k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const save = (k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){} try{syncMark(k)}catch(e){}};
+// shared between all phones: order history, targets, prices, names, added / hidden / removed products
+var SYNC_DB="https://halechmania-orders-default-rtdb.europe-west1.firebasedatabase.app/shops/halechmania-rishon";
+var syncRe=/^hl_(hist|targets|prices|names|extra|hidden|removed)_/;
+function syncGet(k,f){try{const v=localStorage.getItem(k);return v?JSON.parse(v):f}catch(e){return f}}
+function syncPut(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+function syncMark(k){
+  if(!syncRe.test(k)) return;
+  const t=Date.now(), m=syncGet("hl_sync_meta",{}), p=syncGet("hl_sync_pending",{});
+  m[k]=t; p[k]=t; syncPut("hl_sync_meta",m); syncPut("hl_sync_pending",p); syncSoon();
+}
+var syncTimer=null, syncBusy=false;
+function syncSoon(){ clearTimeout(syncTimer); syncTimer=setTimeout(syncFlush,300); }
+async function syncFlush(){
+  if(syncBusy){ syncSoon(); return; }
+  syncBusy=true;
+  try{
+    const pend=syncGet("hl_sync_pending",{}), meta=syncGet("hl_sync_meta",{}), done={};
+    for(const k of Object.keys(pend)){
+      try{
+        let r;
+        if(k.startsWith("hl_hist_")){
+          const obj={}; syncGet(k,[]).forEach(o=>{ if(o && o.ts) obj["t"+o.ts]=JSON.stringify(o); });
+          if(!Object.keys(obj).length){ done[k]=pend[k]; continue; }
+          r=await fetch(SYNC_DB+"/hist/"+k+".json",{method:"PATCH",body:JSON.stringify(obj)});
+        } else {
+          r=await fetch(SYNC_DB+"/set/"+k+".json",{method:"PUT",body:JSON.stringify({v:localStorage.getItem(k)||"null",t:meta[k]||pend[k]})});
+        }
+        if(r.ok) done[k]=pend[k];
+      }catch(e){}
+    }
+    const p=syncGet("hl_sync_pending",{});
+    Object.keys(done).forEach(k=>{ if(p[k]===done[k]) delete p[k]; });
+    syncPut("hl_sync_pending",p);
+    if(Object.keys(p).length) setTimeout(syncFlush,15000);
+  } finally { syncBusy=false; }
+}
+async function syncPull(){
+  let data;
+  try{ const r=await fetch(SYNC_DB+".json",{cache:"no-store"}); if(!r.ok) return; data=(await r.json())||{}; }catch(e){ return; }
+  const meta=syncGet("hl_sync_meta",{}), pend=syncGet("hl_sync_pending",{});
+  let changed=false;
+  const set=data.set||{};
+  Object.keys(set).forEach(k=>{
+    const rv=set[k];
+    if(!syncRe.test(k) || pend[k] || !rv || typeof rv.v!=="string") return;
+    if(!(k in meta) || rv.t>meta[k]){
+      if(localStorage.getItem(k)!==rv.v){ try{ localStorage.setItem(k,rv.v); }catch(e){} changed=true; }
+      meta[k]=rv.t;
+    }
+  });
+  // first time on this phone: send up whatever exists only here
+  Object.keys(localStorage).forEach(k=>{
+    if(syncRe.test(k) && !k.startsWith("hl_hist_") && !(k in meta) && !set[k]){ meta[k]=Date.now(); pend[k]=meta[k]; }
+  });
+  // order history: everything from every phone, merged by time
+  const hist=data.hist||{};
+  const hkeys=new Set(Object.keys(hist).filter(k=>k.startsWith("hl_hist_")));
+  Object.keys(localStorage).forEach(k=>{ if(k.startsWith("hl_hist_")) hkeys.add(k); });
+  hkeys.forEach(k=>{
+    const local=syncGet(k,[]), byTs={};
+    const remote=hist[k]||{};
+    Object.keys(remote).forEach(id=>{ try{ const o=JSON.parse(remote[id]); if(o && o.ts) byTs[o.ts]=o; }catch(e){} });
+    let extra=false;
+    local.forEach(o=>{ if(o && o.ts && !byTs[o.ts]){ byTs[o.ts]=o; extra=true; } });
+    if(extra && !pend[k]) pend[k]=Date.now();
+    const merged=Object.values(byTs).sort((a,b)=>b.ts-a.ts).slice(0,120);
+    if(JSON.stringify(merged)!==JSON.stringify(local)){ syncPut(k,merged); changed=true; }
+  });
+  syncPut("hl_sync_meta",meta); syncPut("hl_sync_pending",pend);
+  if(Object.keys(pend).length) syncSoon();
+  if(changed) syncRefresh();
+}
+function syncRefresh(){
+  try{
+    SUPPLIERS.forEach(s=>{ const ex=syncGet("hl_extra_"+dataKey(s),[]); s.products=s.products.filter(p=>!p.custom || ex.some(x=>x.id===p.id)); });
+    if(cur && !document.getElementById("histView").hidden){ showHistory(); return; }
+    const calm=["overAsk","pinAsk","clearAsk"].every(id=>{ const el=document.getElementById(id); return !el || el.hidden; });
+    if(cur && !editing && !active && !supView.hidden && calm){ st=stateOf(cur); render(); }
+  }catch(e){}
+}
+setTimeout(syncPull,600);
+setInterval(()=>{ if(!document.hidden) syncPull(); },20000);
+document.addEventListener("visibilitychange",()=>{ if(!document.hidden) syncPull(); });
+window.addEventListener("online",()=>{ syncFlush(); syncPull(); });
 // one-time clean start: removes order history and today's counts once per phone (targets, prices and products stay)
 (function(){
   const K="hl_reset_mark", V="clean-2026-11-07";
