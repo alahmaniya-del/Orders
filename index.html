@@ -212,6 +212,11 @@ body::before{background:#1c322a!important}
 body.on-home::before{height:calc(env(safe-area-inset-top,0px) + 36px);background:linear-gradient(to bottom,rgba(28,50,42,.85),rgba(28,50,42,0))!important}
 body.on-home{background-color:var(--bg)}
 #homeView .clock{background:transparent}
+.mhead{margin-top:14px;padding:14px 16px;border-radius:12px;background:var(--accent);color:var(--accent-ink);display:flex;flex-direction:column;gap:4px}
+.mhead:first-child{margin-top:0}
+.mname{font-family:var(--display);font-size:22px;line-height:1.1}
+.msum{font-size:16px;font-weight:800;font-variant-numeric:tabular-nums}
+.msum .msub{font-size:13px;font-weight:600;opacity:.8;margin-top:2px}
 li.section{display:block;background:none;border:0;padding:14px 4px 2px;font-family:var(--display);font-size:18px;color:var(--accent)}
 .name{font-weight:600;min-width:0;overflow-wrap:anywhere}
 .target{text-align:center;font-variant-numeric:tabular-nums;color:var(--muted);font-weight:700}
@@ -523,7 +528,7 @@ const T = {
       preparing:"מכין את ההזמנה…", cancelled:"השליחה בוטלה", busy:"חלון כבר פתוח, נסה שוב בעוד רגע", fail:"לא הצלחתי להכין את ההזמנה. נסה שוב.",
       noLib:"לא הצלחתי לטעון את כלי ה-PDF. נסה לרענן את הדף.", noDl:"שליחת קבצים לא זמינה כאן. נסה לפתוח את הדף מחדש.",
       ready:"ההזמנה מוכנה – לחץ לשליחה", tapAgain:"לחץ שוב כדי לפתוח את השיתוף", shareFail:"לא הצלחתי לשתף. נסה שוב.",
-      lblTarget:"יעד ", noPrice:"חסר מחיר", del:"מחק", dlgDelQ:"אתה בטוח למחוק מוצר זה?", dlgHideQ:"אתה בטוח להסתיר מוצר זה?", dlgDelYes:"כן, מחק", dlgHideYes:"כן, הסתר", dlgNo:"ביטול", hide:"הסתר", show:"הצג", actsCol:"פעולות", deleted:n=>"המוצר \""+n+"\" נמחק", nameLbl:"שם המוצר", nameReq:"חובה לתת שם למוצר החדש", addProd:"+ הוסף מוצר", newProd:"מוצר חדש", updPrice:"עדכן מחיר", priceLbl:"מחיר ₪", editFinish:"סיים עריכה", pinQ:"הקלד קוד", pinWrong:"קוד שגוי, נסה שוב", pinNo:"ביטול", oaTitle:"חרגת מההזמנה הקודמת ב:", monthLine:(m,v)=>"לאחר הזמנה זו, סה״כ חודש "+m+": "+money(v), monthUp:(m,v,d)=>"יותר מחודש "+m+" ("+money(v)+") ב-"+money(d), monthDown:(m,v,d)=>"פחות מחודש "+m+" ("+money(v)+") ב-"+money(d), monthSame:m=>"בדיוק כמו חודש "+m, monthNone:m=>"אין עדיין נתונים לחודש "+m, gaTitle:"כל הכבוד! הוזלת מההזמנה הקודמת ב:", oaTitleU:"הזמנת יותר מההזמנה הקודמת ב:", gaTitleU:"כל הכבוד! הזמנת פחות מההזמנה הקודמת ב:", unitsN:n=>n+" יחידות", oaDetailU:(p,n)=>"הקודמת: "+p+" יח׳  ·  עכשיו: "+n+" יח׳", gaYes:"שלח הזמנה", gaNo:"חזרה", oaAmount:d=>money(d), oaDetail:(prev,now)=>"הקודמת: "+money(prev)+"  ·  עכשיו: "+money(now)+"  (לפני מע״מ)", oaYes:"אשר ושלח", oaNo:"ביטול", oaCancelled:"השליחה בוטלה – אפשר לתקן את הכמויות", smart:"הזמנה חכמה", smartArm:"לחץ שוב למילוי", smartFull:"עוד אין היסטוריה לספק הזה – מולאה הזמנה מלאה לפי היעדים. בדוק ותקן לפני השליחה.", smartDone:n=>"מולא לפי ממוצע "+(n===1?"ההזמנה האחרונה":n+" ההזמנות האחרונות")+". בדוק ותקן לפני השליחה.", totalLbl:"סה״כ הזמנה · לפני מע״מ", perUnit:"ליח׳", noPriceN:n=>(n===1?"מוצר אחד":n+" מוצרים")+" בלי מחיר – לא נכללים בסכום", histTotal:"סה״כ לפני מע״מ", vatLbl:"מע״מ 18%", grandLbl:"סה״כ כולל מע״מ", hist:"היסטוריה", histBack:"→ חזרה", histTitle:n=>"היסטוריית הזמנות · "+n, histEmpty:"עוד לא נשלחו הזמנות לספק הזה.", histCount:n=>n+" מוצרים", noteWord:"הערה: ", missRow:"לא סומן – רשום כמות (גם 0)", notMarked:n=>(n===1?"מוצר אחד לא סומן":n+" מוצרים לא סומנו")+". סמן הכול לפני השליחה.", lblLeft:"נשאר במלאי ", lblQty:"כמות להזמנה ", locale:"he-IL", dir:"rtl"},
+      lblTarget:"יעד ", noPrice:"חסר מחיר", del:"מחק", dlgDelQ:"אתה בטוח למחוק מוצר זה?", dlgHideQ:"אתה בטוח להסתיר מוצר זה?", dlgDelYes:"כן, מחק", dlgHideYes:"כן, הסתר", dlgNo:"ביטול", hide:"הסתר", show:"הצג", actsCol:"פעולות", deleted:n=>"המוצר \""+n+"\" נמחק", nameLbl:"שם המוצר", nameReq:"חובה לתת שם למוצר החדש", addProd:"+ הוסף מוצר", newProd:"מוצר חדש", updPrice:"עדכן מחיר", priceLbl:"מחיר ₪", editFinish:"סיים עריכה", pinQ:"הקלד קוד", pinWrong:"קוד שגוי, נסה שוב", pinNo:"ביטול", oaTitle:"חרגת מההזמנה הקודמת ב:", monthLine:(m,v)=>"לאחר הזמנה זו, סה״כ חודש "+m+": "+money(v), monthUp:(m,v,d)=>"יותר מחודש "+m+" ("+money(v)+") ב-"+money(d), monthDown:(m,v,d)=>"פחות מחודש "+m+" ("+money(v)+") ב-"+money(d), monthSame:m=>"בדיוק כמו חודש "+m, monthNone:m=>"אין עדיין נתונים לחודש "+m, gaTitle:"כל הכבוד! הוזלת מההזמנה הקודמת ב:", oaTitleU:"הזמנת יותר מההזמנה הקודמת ב:", gaTitleU:"כל הכבוד! הזמנת פחות מההזמנה הקודמת ב:", unitsN:n=>n+" יחידות", oaDetailU:(p,n)=>"הקודמת: "+p+" יח׳  ·  עכשיו: "+n+" יח׳", gaYes:"שלח הזמנה", gaNo:"חזרה", oaAmount:d=>money(d), oaDetail:(prev,now)=>"הקודמת: "+money(prev)+"  ·  עכשיו: "+money(now)+"  (לפני מע״מ)", oaYes:"אשר ושלח", oaNo:"ביטול", oaCancelled:"השליחה בוטלה – אפשר לתקן את הכמויות", smart:"הזמנה חכמה", smartArm:"לחץ שוב למילוי", smartFull:"עוד אין היסטוריה לספק הזה – מולאה הזמנה מלאה לפי היעדים. בדוק ותקן לפני השליחה.", smartDone:n=>"מולא לפי ממוצע "+(n===1?"ההזמנה האחרונה":n+" ההזמנות האחרונות")+". בדוק ותקן לפני השליחה.", totalLbl:"סה״כ הזמנה · לפני מע״מ", perUnit:"ליח׳", noPriceN:n=>(n===1?"מוצר אחד":n+" מוצרים")+" בלי מחיר – לא נכללים בסכום", histTotal:"סה״כ לפני מע״מ", monthSoFar:(n,t,g)=>["סיכום עד כה: "+money(t)+" לפני מע״מ","כולל מע״מ: "+money(g)+"  ·  "+n+(n===1?" הזמנה":" הזמנות")], monthCount:n=>n+(n===1?" הזמנה":" הזמנות")+" החודש", vatLbl:"מע״מ 18%", grandLbl:"סה״כ כולל מע״מ", hist:"היסטוריה", histBack:"→ חזרה", histTitle:n=>"היסטוריית הזמנות · "+n, histEmpty:"עוד לא נשלחו הזמנות לספק הזה.", histCount:n=>n+" מוצרים", noteWord:"הערה: ", missRow:"לא סומן – רשום כמות (גם 0)", notMarked:n=>(n===1?"מוצר אחד לא סומן":n+" מוצרים לא סומנו")+". סמן הכול לפני השליחה.", lblLeft:"נשאר במלאי ", lblQty:"כמות להזמנה ", locale:"he-IL", dir:"rtl"},
   fr:{back:"← Fournisseurs", edit:"Modifier", editDone:"Terminer", clear:"Effacer la commande", clearQ:"Effacer toute la commande ?", clearYes:"Oui, effacer", clearNo:"Annuler", cleared:"Commande effacée",
       cols:["Produit","Objectif","Reste","À commander"], empty:"Aucun produit pour ce fournisseur.",
       noteLabel:"Note pour le fournisseur (facultatif)", notePh:"Ex. : livrer avant 7h00", preview:"Aperçu de la commande", send:"Envoyer la commande",
@@ -533,7 +538,7 @@ const T = {
       preparing:"Préparation de la commande…", cancelled:"Envoi annulé", busy:"Une fenêtre est déjà ouverte, réessayez dans un instant", fail:"Impossible de préparer la commande. Réessayez.",
       noLib:"Impossible de charger l’outil PDF. Rechargez la page.", noDl:"L’envoi de fichiers n’est pas disponible ici. Rouvrez la page.",
       ready:"Commande prête – appuyez pour envoyer", tapAgain:"Appuyez encore pour ouvrir le partage", shareFail:"Partage impossible. Réessayez.",
-      lblTarget:"Objectif ", noPrice:"Prix manquant", del:"Suppr.", dlgDelQ:"Supprimer ce produit ?", dlgHideQ:"Masquer ce produit ?", dlgDelYes:"Oui, supprimer", dlgHideYes:"Oui, masquer", dlgNo:"Annuler", hide:"Masquer", show:"Afficher", actsCol:"Actions", deleted:n=>"Produit « "+n+" » supprimé", nameLbl:"Nom du produit", nameReq:"Donnez un nom au nouveau produit", addProd:"+ Ajouter un produit", newProd:"Nouveau produit", updPrice:"Modifier le prix", priceLbl:"Prix ₪", editFinish:"Terminer la modification", pinQ:"Entrez le code", pinWrong:"Code incorrect, réessayez", pinNo:"Annuler", oaTitle:"Dépassement par rapport à la commande précédente :", monthLine:(m,v)=>"Après cette commande, total de "+m+" : "+money(v), monthUp:(m,v,d)=>"Plus que "+m+" ("+money(v)+") de "+money(d), monthDown:(m,v,d)=>"Moins que "+m+" ("+money(v)+") de "+money(d), monthSame:m=>"Identique à "+m, monthNone:m=>"Pas encore de données pour "+m, gaTitle:"Bravo ! Économie par rapport à la commande précédente :", oaTitleU:"Plus que la commande précédente :", gaTitleU:"Bravo ! Moins que la commande précédente :", unitsN:n=>n+" unités", oaDetailU:(p,n)=>"Précédente : "+p+" u.  ·  Actuelle : "+n+" u.", gaYes:"Envoyer la commande", gaNo:"Retour", oaAmount:d=>money(d), oaDetail:(prev,now)=>"Précédente : "+money(prev)+"  ·  Actuelle : "+money(now)+"  (HT)", oaYes:"Confirmer et envoyer", oaNo:"Annuler", oaCancelled:"Envoi annulé – vous pouvez corriger les quantités", smart:"Commande intelligente", smartArm:"Appuyez encore pour remplir", smartFull:"Pas encore d’historique – commande complète selon les objectifs. Vérifiez avant l’envoi.", smartDone:n=>"Rempli selon la moyenne des "+n+" dernières commandes. Vérifiez avant l’envoi.", totalLbl:"Total commande · HT", perUnit:"/u", noPriceN:n=>n+" produit(s) sans prix – non inclus", histTotal:"Total HT", vatLbl:"TVA 18 %", grandLbl:"Total TTC", hist:"Historique", histBack:"← Retour", histTitle:n=>"Historique des commandes · "+n, histEmpty:"Aucune commande envoyée pour ce fournisseur.", histCount:n=>n+" produits", noteWord:"Note : ", missRow:"Non renseigné – saisissez une quantité (même 0)", notMarked:n=>(n===1?"1 produit non renseigné":n+" produits non renseignés")+". Complétez tout avant l’envoi.", lblLeft:"Reste en stock ", lblQty:"Quantité à commander ", locale:"fr-FR", dir:"ltr"}
+      lblTarget:"Objectif ", noPrice:"Prix manquant", del:"Suppr.", dlgDelQ:"Supprimer ce produit ?", dlgHideQ:"Masquer ce produit ?", dlgDelYes:"Oui, supprimer", dlgHideYes:"Oui, masquer", dlgNo:"Annuler", hide:"Masquer", show:"Afficher", actsCol:"Actions", deleted:n=>"Produit « "+n+" » supprimé", nameLbl:"Nom du produit", nameReq:"Donnez un nom au nouveau produit", addProd:"+ Ajouter un produit", newProd:"Nouveau produit", updPrice:"Modifier le prix", priceLbl:"Prix ₪", editFinish:"Terminer la modification", pinQ:"Entrez le code", pinWrong:"Code incorrect, réessayez", pinNo:"Annuler", oaTitle:"Dépassement par rapport à la commande précédente :", monthLine:(m,v)=>"Après cette commande, total de "+m+" : "+money(v), monthUp:(m,v,d)=>"Plus que "+m+" ("+money(v)+") de "+money(d), monthDown:(m,v,d)=>"Moins que "+m+" ("+money(v)+") de "+money(d), monthSame:m=>"Identique à "+m, monthNone:m=>"Pas encore de données pour "+m, gaTitle:"Bravo ! Économie par rapport à la commande précédente :", oaTitleU:"Plus que la commande précédente :", gaTitleU:"Bravo ! Moins que la commande précédente :", unitsN:n=>n+" unités", oaDetailU:(p,n)=>"Précédente : "+p+" u.  ·  Actuelle : "+n+" u.", gaYes:"Envoyer la commande", gaNo:"Retour", oaAmount:d=>money(d), oaDetail:(prev,now)=>"Précédente : "+money(prev)+"  ·  Actuelle : "+money(now)+"  (HT)", oaYes:"Confirmer et envoyer", oaNo:"Annuler", oaCancelled:"Envoi annulé – vous pouvez corriger les quantités", smart:"Commande intelligente", smartArm:"Appuyez encore pour remplir", smartFull:"Pas encore d’historique – commande complète selon les objectifs. Vérifiez avant l’envoi.", smartDone:n=>"Rempli selon la moyenne des "+n+" dernières commandes. Vérifiez avant l’envoi.", totalLbl:"Total commande · HT", perUnit:"/u", noPriceN:n=>n+" produit(s) sans prix – non inclus", histTotal:"Total HT", monthSoFar:(n,t,g)=>["Total à ce jour : "+money(t)+" HT","TTC : "+money(g)+"  ·  "+n+" commande(s)"], monthCount:n=>n+" commande(s)", vatLbl:"TVA 18 %", grandLbl:"Total TTC", hist:"Historique", histBack:"← Retour", histTitle:n=>"Historique des commandes · "+n, histEmpty:"Aucune commande envoyée pour ce fournisseur.", histCount:n=>n+" produits", noteWord:"Note : ", missRow:"Non renseigné – saisissez une quantité (même 0)", notMarked:n=>(n===1?"1 produit non renseigné":n+" produits non renseignés")+". Complétez tout avant l’envoi.", lblLeft:"Reste en stock ", lblQty:"Quantité à commander ", locale:"fr-FR", dir:"ltr"}
 };
 let L="he";
 const tr = () => T[L];
@@ -563,6 +568,16 @@ const todayKey = () => { const d=new Date(); return d.getFullYear()+"-"+(d.getMo
 const fmtDate = d => d.toLocaleDateString("he-IL",{weekday:"long",day:"numeric",month:"numeric",year:"numeric"});
 const load = (k,f)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):f}catch(e){return f}};
 const save = (k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+// one-time clean start: removes order history and today's counts once per phone (targets, prices and products stay)
+(function(){
+  const K="hl_reset_mark", V="clean-2026-11-07";
+  try{
+    if(localStorage.getItem(K)!==V){
+      Object.keys(localStorage).filter(k=>k.startsWith("hl_hist_")||k.startsWith("hl_day")).forEach(k=>localStorage.removeItem(k));
+      localStorage.setItem(K,V);
+    }
+  }catch(e){}
+})();
 const num = v => { if(v===""||v==null) return null; const n=parseFloat(String(v).replace(",",".")); return isNaN(n)?null:n; };
 const trim = n => Math.round(n*100)/100;
 
@@ -980,7 +995,26 @@ function showHistory(){
   const h=load("hl_hist_"+dataKey(cur),[]);
   if(!h.length){ const e=document.createElement("div"); e.className="empty"; e.textContent=tr().histEmpty; box.appendChild(e); }
   const byId=Object.fromEntries(cur.products.map(p=>[p.id,p]));
+  // month summary: one header per month, with the total so far
+  const mk=ts=>{ const d=new Date(ts); return d.getFullYear()+"-"+d.getMonth(); };
+  const months={};
+  h.forEach(o=>{ const k=mk(o.ts); const m=months[k]||(months[k]={n:0,t:0,priced:false}); m.n++; if(o.total!=null){ m.t+=o.total; m.priced=true; } });
+  let lastM=null;
   h.forEach(o=>{
+    const k=mk(o.ts);
+    if(k!==lastM){
+      lastM=k; const m=months[k], d=new Date(o.ts);
+      const hd=document.createElement("div"); hd.className="mhead";
+      const nm=document.createElement("div"); nm.className="mname"; nm.textContent=d.toLocaleDateString(tr().locale,{month:"long",year:"numeric"});
+      const sm=document.createElement("div"); sm.className="msum";
+      if(m.priced){
+        const t=Math.round(m.t*100)/100, v=Math.round(t*VAT*100)/100;
+        const [l1,l2]=tr().monthSoFar(m.n,t,Math.round((t+v)*100)/100);
+        const a=document.createElement("div"); a.textContent=l1; const c=document.createElement("div"); c.className="msub"; c.textContent=l2;
+        sm.append(a,c);
+      } else sm.textContent=tr().monthCount(m.n);
+      hd.append(nm,sm); box.appendChild(hd);
+    }
     const d=document.createElement("details");
     const sm=document.createElement("summary");
     const w=document.createElement("span"); w.className="when";
