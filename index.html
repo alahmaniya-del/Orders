@@ -193,9 +193,12 @@ li.addrow button:focus-visible{outline:2px solid var(--accent)}
 .dlg-yes{flex:1;color:#fff}
 .dlg.del .dlg-yes{background:var(--err)}
 .dlg.hide .dlg-yes{background:#8c8a84}
-.hreset{margin-top:28px;display:flex;flex-direction:column;align-items:center;gap:10px}
-.hreset-btn{font:inherit;font-weight:800;font-size:15px;color:var(--err);background:none;border:1.5px solid var(--err);border-radius:10px;padding:10px 18px;cursor:pointer}
-.hreset .pin-ask{width:100%;box-sizing:border-box}
+.hrow{position:relative;border-radius:12px;overflow:hidden}
+.hrow details{position:relative;z-index:1;touch-action:pan-y}
+.hdel{position:absolute;inset-block:0;inset-inline-end:0;width:96px;border:0;border-radius:12px;background:var(--err);color:#fff;font:inherit;font-weight:800;font-size:16px;cursor:pointer}
+.hhint{font-size:13px;color:var(--muted);text-align:center;margin-top:8px}
+.dlg-pin{font:inherit;font-size:22px;font-weight:700;text-align:center;letter-spacing:.3em;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--field);color:var(--ink);width:100%;box-sizing:border-box}
+.dlg.shake{animation:shake .35s}
 .dlg-no{background:var(--bg);color:var(--ink)}
 li.noname input.namein{border-color:var(--err);box-shadow:0 0 0 3px color-mix(in srgb,var(--err) 20%,transparent)}
 li.noname .name::after{content:attr(data-noname);display:block;font-size:13px;font-weight:800;color:var(--err);margin-top:4px}
@@ -210,6 +213,10 @@ li.noname .name::after{content:attr(data-noname);display:block;font-size:13px;fo
 .intro-bg.out{opacity:0;pointer-events:none}
 @media (prefers-reduced-motion:reduce){.intro-bg{transition:none}}
 #homeView{position:relative;z-index:1}
+/* home fits one screen: the tiles share the space between the logo and the clock */
+#homeView{box-sizing:border-box;height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));min-height:520px;display:flex;flex-direction:column;padding-bottom:84px}
+#homeView .tiles{flex:1;min-height:0;grid-auto-rows:minmax(56px,1fr);margin-top:clamp(16px,3.5vh,40px)}
+#homeView .tile{min-height:0;padding:10px 12px}
 /* status-bar band: dark green so the phone's white clock stays readable; on home it fades into the photo */
 body::before{background:#1c322a!important}
 body.on-home::before{height:calc(env(safe-area-inset-top,0px) + 36px);background:linear-gradient(to bottom,rgba(28,50,42,.85),rgba(28,50,42,0))!important}
@@ -330,23 +337,14 @@ body.kp-open #supView header{padding-block:4px 6px}
       <h1 class="sname" id="histTitle"></h1>
     </header>
     <div class="hist" id="histList"></div>
-    <div class="hreset">
-      <button type="button" class="hreset-btn" id="histResetBtn">אפס היסטוריה</button>
-      <div class="pin-ask" id="hrPin" hidden>
-        <label for="hrPinIn" id="hrPinQ">הקלד קוד</label>
-        <div class="pin-row">
-          <input id="hrPinIn" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off">
-          <button type="button" class="ca-no" id="hrPinNo">ביטול</button>
-        </div>
-        <div class="pin-err" id="hrPinErr" role="alert"></div>
-      </div>
-    </div>
   </section>
 
   <div class="dlg-back" id="dlg" hidden>
     <div class="dlg" role="dialog" aria-modal="true" aria-labelledby="dlgQ">
       <div class="dlg-q" id="dlgQ"></div>
       <div class="dlg-name" id="dlgName"></div>
+      <input class="dlg-pin" id="dlgPin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" hidden>
+      <div class="pin-err" id="dlgErr" role="alert"></div>
       <div class="dlg-btns">
         <button type="button" class="dlg-yes" id="dlgYes"></button>
         <button type="button" class="dlg-no" id="dlgNo"></button>
@@ -500,6 +498,16 @@ const SUPPLIERS = [
     ["r9","לימון משומר",4],
     ["r11","פלפל שחור גרוס",2],
     ["r12","מיונז HILDA 5 ק\"ג",5]
+  ]},
+  { id:"basar", name:"ק.א בשר מן הכפר", category:"", products:[
+    ["b1","שניצל (ק\"ג)",30],
+    ["b2","מעורב ירושלמי (קרטון)",1],
+    ["b3","פרגיות (קרטון)",1],
+    ["b4","סלייסים אנטריקוט (קרטון)",1]
+  ]},
+  { id:"lechem", name:"לחם הכפר", category:"", products:[
+    ["l1","שמינייה תבנית",250],
+    ["l2","פרנה עגול 200 גר'",30]
   ]}
 ].map(s=>({...s, products:s.products.map(([id,name,target])=>target==="§"?{id,name,target:null,section:true}:{id,name,target})}));
 
@@ -520,6 +528,7 @@ const dataKey = s => s.base || s.id;
 const PRICES = {
   c1:104.42, c2:94.94, c3:94.94, c4:40.47, c5:92.82, c6:54.54, c7:69.03, c8:69.03, c9:72.9, c10:69.68, c12:115.61,
   r1:142.5, r2:78, r3:96, r4:132, r5:85.2, r6:126, r8:53, r9:28.6, r11:204, r12:44,
+  l1:3, l2:3.53,
   z1:109, z2:289, z7:81, z8:23.5, z9:110, z10:125, z11:49, z12:89,
   o1:178, o2:155, o7:9.9, o9:92, o11:14, o13:12.5, o14:114, o15:60, o16:3.7, o18:27, o19:12, o28:148, o29:90, o31:78, o32:12, o35:125, o36:276, o37:192, o38:157, o39:276, o40:159
 };
@@ -545,7 +554,7 @@ const T = {
       preparing:"מכין את ההזמנה…", cancelled:"השליחה בוטלה", busy:"חלון כבר פתוח, נסה שוב בעוד רגע", fail:"לא הצלחתי להכין את ההזמנה. נסה שוב.",
       noLib:"לא הצלחתי לטעון את כלי ה-PDF. נסה לרענן את הדף.", noDl:"שליחת קבצים לא זמינה כאן. נסה לפתוח את הדף מחדש.",
       ready:"ההזמנה מוכנה – לחץ לשליחה", tapAgain:"לחץ שוב כדי לפתוח את השיתוף", shareFail:"לא הצלחתי לשתף. נסה שוב.",
-      lblTarget:"יעד ", noPrice:"חסר מחיר", del:"מחק", dlgDelQ:"אתה בטוח למחוק מוצר זה?", dlgHideQ:"אתה בטוח להסתיר מוצר זה?", dlgDelYes:"כן, מחק", dlgHideYes:"כן, הסתר", dlgNo:"ביטול", hide:"הסתר", show:"הצג", actsCol:"פעולות", deleted:n=>"המוצר \""+n+"\" נמחק", nameLbl:"שם המוצר", nameReq:"חובה לתת שם למוצר החדש", addProd:"+ הוסף מוצר", newProd:"מוצר חדש", updPrice:"עדכן מחיר", priceLbl:"מחיר ₪", editFinish:"סיים עריכה", pinQ:"הקלד קוד", pinWrong:"קוד שגוי, נסה שוב", pinNo:"ביטול", oaTitle:"חרגת מההזמנה הקודמת ב:", monthLine:(m,v)=>"לאחר הזמנה זו, סה״כ חודש "+m+": "+money(v), monthUp:(m,v,d)=>"יותר מחודש "+m+" ("+money(v)+") ב-"+money(d), monthDown:(m,v,d)=>"פחות מחודש "+m+" ("+money(v)+") ב-"+money(d), monthSame:m=>"בדיוק כמו חודש "+m, monthNone:m=>"אין עדיין נתונים לחודש "+m, gaTitle:"כל הכבוד! הוזלת מההזמנה הקודמת ב:", oaTitleU:"הזמנת יותר מההזמנה הקודמת ב:", gaTitleU:"כל הכבוד! הזמנת פחות מההזמנה הקודמת ב:", unitsN:n=>n+" יחידות", oaDetailU:(p,n)=>"הקודמת: "+p+" יח׳  ·  עכשיו: "+n+" יח׳", gaYes:"שלח הזמנה", gaNo:"חזרה", oaAmount:d=>money(d), oaDetail:(prev,now)=>"הקודמת: "+money(prev)+"  ·  עכשיו: "+money(now)+"  (לפני מע״מ)", oaYes:"אשר ושלח", oaNo:"ביטול", oaCancelled:"השליחה בוטלה – אפשר לתקן את הכמויות", smart:"הזמנה חכמה", smartArm:"לחץ שוב למילוי", smartFull:"עוד אין היסטוריה לספק הזה – מולאה הזמנה מלאה לפי היעדים. בדוק ותקן לפני השליחה.", smartDone:n=>"מולא לפי ממוצע "+(n===1?"ההזמנה האחרונה":n+" ההזמנות האחרונות")+". בדוק ותקן לפני השליחה.", totalLbl:"סה״כ הזמנה · לפני מע״מ", perUnit:"ליח׳", noPriceN:n=>(n===1?"מוצר אחד":n+" מוצרים")+" בלי מחיר – לא נכללים בסכום", histTotal:"סה״כ לפני מע״מ", monthSoFar:(n,t,g)=>["סיכום עד כה: "+money(t)+" לפני מע״מ","כולל מע״מ: "+money(g)+"  ·  "+n+(n===1?" הזמנה":" הזמנות")], monthCount:n=>n+(n===1?" הזמנה":" הזמנות")+" החודש", vatLbl:"מע״מ 18%", grandLbl:"סה״כ כולל מע״מ", hist:"היסטוריה", histBack:"→ חזרה", histTitle:n=>"היסטוריית הזמנות · "+n, histEmpty:"עוד לא נשלחו הזמנות לספק הזה.", histReset:"אפס היסטוריה", histResetQ:"לאפס את כל ההיסטוריה של הספק?", histResetYes:"כן, אפס", histCount:n=>n+" מוצרים", noteWord:"הערה: ", missRow:"לא סומן – רשום כמות (גם 0)", notMarked:n=>(n===1?"מוצר אחד לא סומן":n+" מוצרים לא סומנו")+". סמן הכול לפני השליחה.", lblLeft:"נשאר במלאי ", lblQty:"כמות להזמנה ", locale:"he-IL", dir:"rtl"},
+      lblTarget:"יעד ", noPrice:"חסר מחיר", del:"מחק", dlgDelQ:"אתה בטוח למחוק מוצר זה?", dlgHideQ:"אתה בטוח להסתיר מוצר זה?", dlgDelYes:"כן, מחק", dlgHideYes:"כן, הסתר", dlgNo:"ביטול", hide:"הסתר", show:"הצג", actsCol:"פעולות", deleted:n=>"המוצר \""+n+"\" נמחק", nameLbl:"שם המוצר", nameReq:"חובה לתת שם למוצר החדש", addProd:"+ הוסף מוצר", newProd:"מוצר חדש", updPrice:"עדכן מחיר", priceLbl:"מחיר ₪", editFinish:"סיים עריכה", pinQ:"הקלד קוד", pinWrong:"קוד שגוי, נסה שוב", pinNo:"ביטול", oaTitle:"חרגת מההזמנה הקודמת ב:", monthLine:(m,v)=>"לאחר הזמנה זו, סה״כ חודש "+m+": "+money(v), monthUp:(m,v,d)=>"יותר מחודש "+m+" ("+money(v)+") ב-"+money(d), monthDown:(m,v,d)=>"פחות מחודש "+m+" ("+money(v)+") ב-"+money(d), monthSame:m=>"בדיוק כמו חודש "+m, monthNone:m=>"אין עדיין נתונים לחודש "+m, gaTitle:"כל הכבוד! הוזלת מההזמנה הקודמת ב:", oaTitleU:"הזמנת יותר מההזמנה הקודמת ב:", gaTitleU:"כל הכבוד! הזמנת פחות מההזמנה הקודמת ב:", unitsN:n=>n+" יחידות", oaDetailU:(p,n)=>"הקודמת: "+p+" יח׳  ·  עכשיו: "+n+" יח׳", gaYes:"שלח הזמנה", gaNo:"חזרה", oaAmount:d=>money(d), oaDetail:(prev,now)=>"הקודמת: "+money(prev)+"  ·  עכשיו: "+money(now)+"  (לפני מע״מ)", oaYes:"אשר ושלח", oaNo:"ביטול", oaCancelled:"השליחה בוטלה – אפשר לתקן את הכמויות", smart:"הזמנה חכמה", smartArm:"לחץ שוב למילוי", smartFull:"עוד אין היסטוריה לספק הזה – מולאה הזמנה מלאה לפי היעדים. בדוק ותקן לפני השליחה.", smartDone:n=>"מולא לפי ממוצע "+(n===1?"ההזמנה האחרונה":n+" ההזמנות האחרונות")+". בדוק ותקן לפני השליחה.", totalLbl:"סה״כ הזמנה · לפני מע״מ", perUnit:"ליח׳", noPriceN:n=>(n===1?"מוצר אחד":n+" מוצרים")+" בלי מחיר – לא נכללים בסכום", histTotal:"סה״כ לפני מע״מ", monthSoFar:(n,t,g)=>["סיכום עד כה: "+money(t)+" לפני מע״מ","כולל מע״מ: "+money(g)+"  ·  "+n+(n===1?" הזמנה":" הזמנות")], monthCount:n=>n+(n===1?" הזמנה":" הזמנות")+" החודש", vatLbl:"מע״מ 18%", grandLbl:"סה״כ כולל מע״מ", hist:"היסטוריה", histBack:"→ חזרה", histTitle:n=>"היסטוריית הזמנות · "+n, histEmpty:"עוד לא נשלחו הזמנות לספק הזה.", histSwipe:"להסרת הזמנה – החלק אותה ימינה", histDelQ:"למחוק את ההזמנה הזו מההיסטוריה?", pinPh:"קוד", histCount:n=>n+" מוצרים", noteWord:"הערה: ", missRow:"לא סומן – רשום כמות (גם 0)", notMarked:n=>(n===1?"מוצר אחד לא סומן":n+" מוצרים לא סומנו")+". סמן הכול לפני השליחה.", lblLeft:"נשאר במלאי ", lblQty:"כמות להזמנה ", locale:"he-IL", dir:"rtl"},
   fr:{back:"← Fournisseurs", edit:"Modifier", editDone:"Terminer", clear:"Effacer la commande", clearQ:"Effacer toute la commande ?", clearYes:"Oui, effacer", clearNo:"Annuler", cleared:"Commande effacée",
       cols:["Produit","Objectif","Reste","À commander"], empty:"Aucun produit pour ce fournisseur.",
       noteLabel:"Note pour le fournisseur (facultatif)", notePh:"Ex. : livrer avant 7h00", preview:"Aperçu de la commande", send:"Envoyer la commande",
@@ -555,7 +564,7 @@ const T = {
       preparing:"Préparation de la commande…", cancelled:"Envoi annulé", busy:"Une fenêtre est déjà ouverte, réessayez dans un instant", fail:"Impossible de préparer la commande. Réessayez.",
       noLib:"Impossible de charger l’outil PDF. Rechargez la page.", noDl:"L’envoi de fichiers n’est pas disponible ici. Rouvrez la page.",
       ready:"Commande prête – appuyez pour envoyer", tapAgain:"Appuyez encore pour ouvrir le partage", shareFail:"Partage impossible. Réessayez.",
-      lblTarget:"Objectif ", noPrice:"Prix manquant", del:"Suppr.", dlgDelQ:"Supprimer ce produit ?", dlgHideQ:"Masquer ce produit ?", dlgDelYes:"Oui, supprimer", dlgHideYes:"Oui, masquer", dlgNo:"Annuler", hide:"Masquer", show:"Afficher", actsCol:"Actions", deleted:n=>"Produit « "+n+" » supprimé", nameLbl:"Nom du produit", nameReq:"Donnez un nom au nouveau produit", addProd:"+ Ajouter un produit", newProd:"Nouveau produit", updPrice:"Modifier le prix", priceLbl:"Prix ₪", editFinish:"Terminer la modification", pinQ:"Entrez le code", pinWrong:"Code incorrect, réessayez", pinNo:"Annuler", oaTitle:"Dépassement par rapport à la commande précédente :", monthLine:(m,v)=>"Après cette commande, total de "+m+" : "+money(v), monthUp:(m,v,d)=>"Plus que "+m+" ("+money(v)+") de "+money(d), monthDown:(m,v,d)=>"Moins que "+m+" ("+money(v)+") de "+money(d), monthSame:m=>"Identique à "+m, monthNone:m=>"Pas encore de données pour "+m, gaTitle:"Bravo ! Économie par rapport à la commande précédente :", oaTitleU:"Plus que la commande précédente :", gaTitleU:"Bravo ! Moins que la commande précédente :", unitsN:n=>n+" unités", oaDetailU:(p,n)=>"Précédente : "+p+" u.  ·  Actuelle : "+n+" u.", gaYes:"Envoyer la commande", gaNo:"Retour", oaAmount:d=>money(d), oaDetail:(prev,now)=>"Précédente : "+money(prev)+"  ·  Actuelle : "+money(now)+"  (HT)", oaYes:"Confirmer et envoyer", oaNo:"Annuler", oaCancelled:"Envoi annulé – vous pouvez corriger les quantités", smart:"Commande intelligente", smartArm:"Appuyez encore pour remplir", smartFull:"Pas encore d’historique – commande complète selon les objectifs. Vérifiez avant l’envoi.", smartDone:n=>"Rempli selon la moyenne des "+n+" dernières commandes. Vérifiez avant l’envoi.", totalLbl:"Total commande · HT", perUnit:"/u", noPriceN:n=>n+" produit(s) sans prix – non inclus", histTotal:"Total HT", monthSoFar:(n,t,g)=>["Total à ce jour : "+money(t)+" HT","TTC : "+money(g)+"  ·  "+n+" commande(s)"], monthCount:n=>n+" commande(s)", vatLbl:"TVA 18 %", grandLbl:"Total TTC", hist:"Historique", histBack:"← Retour", histTitle:n=>"Historique des commandes · "+n, histEmpty:"Aucune commande envoyée pour ce fournisseur.", histReset:"Réinitialiser l’historique", histResetQ:"Effacer tout l’historique de ce fournisseur ?", histResetYes:"Oui, effacer", histCount:n=>n+" produits", noteWord:"Note : ", missRow:"Non renseigné – saisissez une quantité (même 0)", notMarked:n=>(n===1?"1 produit non renseigné":n+" produits non renseignés")+". Complétez tout avant l’envoi.", lblLeft:"Reste en stock ", lblQty:"Quantité à commander ", locale:"fr-FR", dir:"ltr"}
+      lblTarget:"Objectif ", noPrice:"Prix manquant", del:"Suppr.", dlgDelQ:"Supprimer ce produit ?", dlgHideQ:"Masquer ce produit ?", dlgDelYes:"Oui, supprimer", dlgHideYes:"Oui, masquer", dlgNo:"Annuler", hide:"Masquer", show:"Afficher", actsCol:"Actions", deleted:n=>"Produit « "+n+" » supprimé", nameLbl:"Nom du produit", nameReq:"Donnez un nom au nouveau produit", addProd:"+ Ajouter un produit", newProd:"Nouveau produit", updPrice:"Modifier le prix", priceLbl:"Prix ₪", editFinish:"Terminer la modification", pinQ:"Entrez le code", pinWrong:"Code incorrect, réessayez", pinNo:"Annuler", oaTitle:"Dépassement par rapport à la commande précédente :", monthLine:(m,v)=>"Après cette commande, total de "+m+" : "+money(v), monthUp:(m,v,d)=>"Plus que "+m+" ("+money(v)+") de "+money(d), monthDown:(m,v,d)=>"Moins que "+m+" ("+money(v)+") de "+money(d), monthSame:m=>"Identique à "+m, monthNone:m=>"Pas encore de données pour "+m, gaTitle:"Bravo ! Économie par rapport à la commande précédente :", oaTitleU:"Plus que la commande précédente :", gaTitleU:"Bravo ! Moins que la commande précédente :", unitsN:n=>n+" unités", oaDetailU:(p,n)=>"Précédente : "+p+" u.  ·  Actuelle : "+n+" u.", gaYes:"Envoyer la commande", gaNo:"Retour", oaAmount:d=>money(d), oaDetail:(prev,now)=>"Précédente : "+money(prev)+"  ·  Actuelle : "+money(now)+"  (HT)", oaYes:"Confirmer et envoyer", oaNo:"Annuler", oaCancelled:"Envoi annulé – vous pouvez corriger les quantités", smart:"Commande intelligente", smartArm:"Appuyez encore pour remplir", smartFull:"Pas encore d’historique – commande complète selon les objectifs. Vérifiez avant l’envoi.", smartDone:n=>"Rempli selon la moyenne des "+n+" dernières commandes. Vérifiez avant l’envoi.", totalLbl:"Total commande · HT", perUnit:"/u", noPriceN:n=>n+" produit(s) sans prix – non inclus", histTotal:"Total HT", monthSoFar:(n,t,g)=>["Total à ce jour : "+money(t)+" HT","TTC : "+money(g)+"  ·  "+n+" commande(s)"], monthCount:n=>n+" commande(s)", vatLbl:"TVA 18 %", grandLbl:"Total TTC", hist:"Historique", histBack:"← Retour", histTitle:n=>"Historique des commandes · "+n, histEmpty:"Aucune commande envoyée pour ce fournisseur.", histSwipe:"Pour supprimer une commande, glissez-la vers la gauche", histDelQ:"Supprimer cette commande de l’historique ?", pinPh:"Code", histCount:n=>n+" produits", noteWord:"Note : ", missRow:"Non renseigné – saisissez une quantité (même 0)", notMarked:n=>(n===1?"1 produit non renseigné":n+" produits non renseignés")+". Complétez tout avant l’envoi.", lblLeft:"Reste en stock ", lblQty:"Quantité à commander ", locale:"fr-FR", dir:"ltr"}
 };
 let L="he";
 const tr = () => T[L];
@@ -606,11 +615,13 @@ async function syncFlush(){
       try{
         let r;
         if(k.startsWith("hl_hist_")){
-          const obj={}; syncGet(k,[]).forEach(o=>{ if(o && o.ts) obj["t"+o.ts]=JSON.stringify(o); });
-          if(!Object.keys(obj).length){
-            r=await fetch(SYNC_DB+"/hist/"+k+".json",{method:"DELETE"});
-            if(r.ok) done[k]=pend[k]; continue;
-          }
+          // deleted orders are kept as "DEL" marks so no phone brings them back
+          const tomb=syncGet("hl_histdel_"+k.slice(8),[]);
+          const g=await fetch(SYNC_DB+"/hist/"+k+".json",{cache:"no-store"}); if(!g.ok) continue;
+          const remote=(await g.json())||{};
+          const obj={}; syncGet(k,[]).forEach(o=>{ if(o && o.ts && remote["t"+o.ts]!=="DEL" && !tomb.includes(o.ts)) obj["t"+o.ts]=JSON.stringify(o); });
+          tomb.forEach(ts=>{ obj["t"+ts]="DEL"; });
+          if(!Object.keys(obj).length){ done[k]=pend[k]; continue; }
           r=await fetch(SYNC_DB+"/hist/"+k+".json",{method:"PATCH",body:JSON.stringify(obj)});
         } else {
           r=await fetch(SYNC_DB+"/set/"+k+".json",{method:"PUT",body:JSON.stringify({v:localStorage.getItem(k)||"null",t:meta[k]||pend[k]})});
@@ -650,9 +661,12 @@ async function syncPull(){
     const cut=Number(syncGet("hl_histreset_"+k.slice(8),0))||0;
     const local=syncGet(k,[]), byTs={};
     const remote=hist[k]||{};
-    Object.keys(remote).forEach(id=>{ try{ const o=JSON.parse(remote[id]); if(o && o.ts && o.ts>cut) byTs[o.ts]=o; }catch(e){} });
+    const tk="hl_histdel_"+k.slice(8), tomb=syncGet(tk,[]), tn=tomb.length;
+    Object.keys(remote).forEach(id=>{ if(remote[id]==="DEL"){ const ts=Number(id.slice(1)); if(!tomb.includes(ts)) tomb.push(ts); } });
+    if(tomb.length!==tn) syncPut(tk,tomb);
+    Object.keys(remote).forEach(id=>{ try{ if(remote[id]==="DEL") return; const o=JSON.parse(remote[id]); if(o && o.ts && o.ts>cut && !tomb.includes(o.ts)) byTs[o.ts]=o; }catch(e){} });
     let extra=false;
-    local.forEach(o=>{ if(o && o.ts && o.ts>cut && !byTs[o.ts]){ byTs[o.ts]=o; extra=true; } });
+    local.forEach(o=>{ if(o && o.ts && o.ts>cut && !tomb.includes(o.ts) && !byTs[o.ts]){ byTs[o.ts]=o; extra=true; } });
     if(extra && !pend[k]) pend[k]=Date.now();
     const merged=Object.values(byTs).sort((a,b)=>b.ts-a.ts).slice(0,120);
     if(JSON.stringify(merged)!==JSON.stringify(local)){ syncPut(k,merged); changed=true; }
@@ -729,10 +743,13 @@ const homeView=document.getElementById("homeView"), supView=document.getElementB
 let cur=null, st=null, editing=false, pendingPriceFocus=null;
 
 function showHome(){
-  cur=null; editing=false; closeKeypad(); L="he"; applyLang();
+  cur=null; editing=false; pinOk=false; closeKeypad(); L="he"; applyLang();
   supView.hidden=true; bar.hidden=true; homeView.hidden=false; document.getElementById("homeBg").hidden=false; document.body.classList.add("on-home"); document.getElementById("histView").hidden=true;
   const tiles=document.getElementById("tiles"); tiles.innerHTML="";
-  SUPPLIERS.forEach(s=>{
+  // home order, read in pairs: right column, left column
+  const TILE_ORDER=["basar","cocacola","yeshm","zafrani","lechem","orpaami","yeshm_fr","rs"];
+  const ordered=TILE_ORDER.map(id=>SUPPLIERS.find(s=>s.id===id)).filter(Boolean).concat(SUPPLIERS.filter(s=>!TILE_ORDER.includes(s.id)));
+  ordered.forEach(s=>{
     const b=document.createElement("button"); b.className="tile"; b.type="button";
     const nm=document.createElement("span"); nm.className="tname"; nm.textContent=s.name;
     if(s.category){ const c=document.createElement("span"); c.className="cat"; c.textContent=s.category; b.append(c); }
@@ -1149,40 +1166,15 @@ function showHistory(){
       });
     }
     if(o.note){ const nt=document.createElement("div"); nt.className="hnote"; nt.textContent=tr().noteWord+o.note; d.appendChild(nt); }
-    box.appendChild(d);
+    box.appendChild(histRow(d,o));
   });
-  hrUpdate();
+  if(h.length){ const hint=document.createElement("div"); hint.className="hhint"; hint.textContent=tr().histSwipe; box.prepend(hint); }
   window.scrollTo(0,0);
 }
 document.getElementById("histBtn").addEventListener("click",showHistory);
-// ---------- reset one supplier's history: code, then confirmation (all phones)
-const hrPin=document.getElementById("hrPin"), hrPinIn=document.getElementById("hrPinIn"), hrBtn=document.getElementById("histResetBtn");
-function hrUpdate(){ hrBtn.textContent=tr().histReset; hrBtn.hidden = !cur || !load("hl_hist_"+dataKey(cur),[]).length; hrPin.hidden=true; }
-hrBtn.addEventListener("click",()=>{
-  document.getElementById("hrPinQ").textContent=tr().pinQ; document.getElementById("hrPinNo").textContent=tr().pinNo;
-  document.getElementById("hrPinErr").textContent=""; hrPinIn.value=""; hrBtn.hidden=true; hrPin.hidden=false; hrPinIn.focus();
-});
-document.getElementById("hrPinNo").addEventListener("click",()=>{ hrPinIn.blur(); hrUpdate(); });
-hrPinIn.addEventListener("input",()=>{
-  hrPinIn.value=hrPinIn.value.replace(/\D/g,"").slice(0,4);
-  if(hrPinIn.value.length<4) return;
-  if(hrPinIn.value===EDIT_PIN){
-    hrPinIn.blur(); hrPin.hidden=true;
-    const x=tr(), box=document.querySelector("#dlg .dlg"); box.className="dlg del";
-    document.getElementById("dlgQ").textContent=x.histResetQ;
-    document.getElementById("dlgName").textContent=cur.title||cur.name;
-    document.getElementById("dlgYes").textContent=x.histResetYes;
-    document.getElementById("dlgNo").textContent=x.dlgNo;
-    document.getElementById("dlg").setAttribute("dir",x.dir);
-    dlgAction=()=>{ const k=dataKey(cur); save("hl_histreset_"+k,Date.now()); save("hl_hist_"+k,[]); showHistory(); };
-    document.getElementById("dlg").hidden=false;
-    document.getElementById("dlgNo").addEventListener("click",hrUpdate,{once:true});
-  } else {
-    document.getElementById("hrPinErr").textContent=tr().pinWrong; hrPinIn.value="";
-    hrPin.classList.remove("shake"); void hrPin.offsetWidth; hrPin.classList.add("shake");
-  }
-});
+
 document.getElementById("histBack").addEventListener("click",()=>{
+  pinOk=false; // leaving a locked page locks it again
   document.getElementById("histView").hidden=true; supView.hidden=false; bar.hidden=false; window.scrollTo(0,0);
 });
 
@@ -1233,7 +1225,67 @@ function askDlg(kind,p,action){
   dlgAction=action; document.getElementById("dlg").hidden=false;
   document.getElementById("dlgNo").focus();
 }
-function closeDlg(){ document.getElementById("dlg").hidden=true; dlgAction=null; }
+function closeDlg(){ document.getElementById("dlg").hidden=true; dlgAction=null; dlgPin.hidden=true; dlgPin.value=""; document.getElementById("dlgErr").textContent=""; }
+// ---------- delete one order from the history: swipe it, tap "מחק", enter the code
+const dlgPin=document.getElementById("dlgPin");
+dlgPin.addEventListener("input",()=>{ dlgPin.value=dlgPin.value.replace(/\D/g,"").slice(0,4); document.getElementById("dlgErr").textContent=""; });
+document.getElementById("dlgYes").addEventListener("click",e=>{
+  if(dlgPin.hidden) return;
+  if(dlgPin.value!==EDIT_PIN){
+    e.stopImmediatePropagation();
+    document.getElementById("dlgErr").textContent=tr().pinWrong; dlgPin.value="";
+    const bx=document.querySelector("#dlg .dlg"); bx.classList.remove("shake"); void bx.offsetWidth; bx.classList.add("shake");
+    dlgPin.focus();
+  }
+},true);
+function askDelOrder(o){
+  const x=tr(), box=document.querySelector("#dlg .dlg"); box.className="dlg del";
+  document.getElementById("dlgQ").textContent=x.histDelQ;
+  const dt=new Date(o.ts);
+  document.getElementById("dlgName").textContent=dt.toLocaleDateString(x.locale,{weekday:"long",day:"numeric",month:"numeric",year:"2-digit"})+", "+dt.toLocaleTimeString(x.locale,{hour:"2-digit",minute:"2-digit"})+(o.total!=null?" · "+money(o.total):"");
+  document.getElementById("dlgYes").textContent=x.dlgDelYes;
+  document.getElementById("dlgNo").textContent=x.dlgNo;
+  document.getElementById("dlg").setAttribute("dir",x.dir);
+  dlgPin.placeholder=x.pinPh; dlgPin.value=""; dlgPin.hidden=false; document.getElementById("dlgErr").textContent="";
+  dlgAction=()=>deleteOrder(o);
+  document.getElementById("dlg").hidden=false; dlgPin.focus();
+}
+function deleteOrder(o){
+  const k=dataKey(cur), t=load("hl_histdel_"+k,[]);
+  if(!t.includes(o.ts)){ t.push(o.ts); save("hl_histdel_"+k,t); }
+  save("hl_hist_"+k, load("hl_hist_"+k,[]).filter(x=>x.ts!==o.ts));
+  showHistory();
+}
+function histRow(d,o){
+  const w=document.createElement("div"); w.className="hrow";
+  const del=document.createElement("button"); del.type="button"; del.className="hdel"; del.textContent=tr().del;
+  del.addEventListener("click",()=>{ w._close(); askDelOrder(o); });
+  w.append(del,d);
+  const sign = tr().dir==="rtl" ? 1 : -1, W=96;
+  let x0=null, y0=null, dx=0, drag=false, open=false;
+  const put=(v,anim)=>{ d.style.transition=anim?"transform .2s ease":"none"; d.style.transform=v?"translateX("+v+"px)":""; };
+  d.addEventListener("touchstart",e=>{ const t=e.touches[0]; x0=t.clientX; y0=t.clientY; drag=false; },{passive:true});
+  d.addEventListener("touchmove",e=>{
+    if(x0==null) return;
+    const t=e.touches[0], mx=t.clientX-x0, my=t.clientY-y0;
+    if(!drag){
+      if(Math.abs(mx)>10 && Math.abs(mx)>Math.abs(my)*1.3){ drag=true; document.querySelectorAll(".hrow").forEach(r=>{ if(r!==w && r._close) r._close(); }); }
+      else if(Math.abs(my)>10){ x0=null; return; }
+      else return;
+    }
+    e.preventDefault();
+    dx=(open?sign*W:0)+mx;
+    dx = sign>0 ? Math.max(0,Math.min(dx,W+30)) : Math.min(0,Math.max(dx,-W-30));
+    put(dx,false);
+  },{passive:false});
+  d.addEventListener("touchend",()=>{ if(drag){ open=Math.abs(dx)>W/2; put(open?sign*W:0,true); } x0=null; });
+  d.querySelector("summary").addEventListener("click",e=>{
+    if(drag){ e.preventDefault(); drag=false; return; }
+    if(open){ e.preventDefault(); w._close(); }
+  });
+  w._close=()=>{ open=false; dx=0; put(0,true); };
+  return w;
+}
 document.getElementById("dlgYes").addEventListener("click",()=>{ const a=dlgAction; closeDlg(); if(a) a(); });
 document.getElementById("dlgNo").addEventListener("click",closeDlg);
 document.getElementById("dlg").addEventListener("click",e=>{ if(e.target.id==="dlg") closeDlg(); });
