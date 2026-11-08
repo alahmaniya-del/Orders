@@ -79,10 +79,12 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
 .rep-t td:first-child,.rep-t th:first-child{white-space:normal;word-break:break-word}
 .rep-t td.tagc,.rep-t th.tagc{padding-inline:2px 6px;width:1%}
 .rep-t .trend{font-weight:800;font-size:13px}
+.rep-t td.dcol{font-size:12.5px;color:var(--muted);font-weight:700}
 .up{color:var(--err)} .down{color:var(--ok)}
 .rep-sum b.up{color:var(--err)} .rep-sum b.down{color:var(--ok)}
 .rep-nf{all:unset;cursor:pointer;font-size:11px;font-weight:800;color:var(--warn);text-decoration:underline dotted;text-underline-offset:3px;white-space:nowrap}
-.rep-per{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:4px 0 0}
+.rep-per{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin:4px 0 0}
+.rep-per button{font-size:13.5px!important;line-height:1.15;padding:8px 2px!important}
 .rep-per button{font:inherit;font-weight:800;font-size:15px;padding:9px 4px;border-radius:10px;border:1px solid var(--line);background:var(--field);color:var(--ink);cursor:pointer}
 .rep-per button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .rep-ctrl select.inactive{opacity:.55}
@@ -339,10 +341,15 @@ li.noname .name::after{content:attr(data-noname);display:block;font-size:13px;fo
 /* opening screen: the photo in full for a second, then it fades into the shadow */
 .intro-bg{position:fixed;inset:0;z-index:50;background-color:#1c322a;background-position:center;background-size:cover;opacity:1;transition:opacity 1s ease}
 .intro-bg.out{opacity:0;pointer-events:none}
+/* on the iPhone home-screen app the screen is taller than the page area: let both photos reach the very bottom */
+.home-bg,.intro-bg{bottom:auto;height:calc(100lvh + env(safe-area-inset-top,0px) + env(safe-area-inset-bottom,0px) + 160px);min-height:100%}
+/* the very first launch of the home-screen app can report a short screen: paint the whole page in the app colour */
+html{background:var(--bg);min-height:100%}
+html:has(body.on-home){background:var(--bg)}
 @media (prefers-reduced-motion:reduce){.intro-bg{transition:none}}
 #homeView{position:relative;z-index:1}
 /* home fits one screen: the tiles share the space between the logo and the clock */
-#homeView{box-sizing:border-box;height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));min-height:520px;display:flex;flex-direction:column;padding-bottom:84px}
+#homeView{box-sizing:border-box;height:calc(var(--app-h,100dvh) - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));min-height:520px;display:flex;flex-direction:column;padding-bottom:84px}
 #homeView .tiles{flex:1;min-height:0;grid-auto-rows:minmax(56px,1fr);margin-top:clamp(16px,3.5vh,40px)}
 #homeView .tile{min-height:0;padding:10px 12px}
 /* status-bar band: dark green so the phone's white clock stays readable; on home it fades into the photo */
@@ -503,8 +510,9 @@ body.kp-open #supView header{padding-block:4px 6px}
     <div class="rep-per" id="repPer" role="group" aria-label="תקופה">
       <button type="button" data-p="day">היום</button>
       <button type="button" data-p="week">השבוע</button>
+      <button type="button" data-p="lastweek">השבוע שעבר</button>
       <button type="button" data-p="month">החודש</button>
-      <button type="button" data-p="year">השנה</button>
+      <button type="button" data-p="lastmonth">החודש שעבר</button>
     </div>
     <div id="repOut"></div>
     <div class="rep-actions">
@@ -997,6 +1005,11 @@ const missingOf = (s,st) => s.products.filter(p=>!excluded(p,st) && targetOf(p,s
 const homeView=document.getElementById("homeView"), supView=document.getElementById("supView"), bar=document.getElementById("bar");
 let cur=null, st=null, editing=false, pendingPriceFocus=null;
 
+// the real screen height (iPhone home-screen app can report it late on first launch)
+function fitScreen(){ const h=Math.max(window.innerHeight, document.documentElement.clientHeight||0); document.documentElement.style.setProperty("--app-h",h+"px"); }
+fitScreen(); window.addEventListener("resize",fitScreen); window.addEventListener("orientationchange",()=>setTimeout(fitScreen,300));
+window.addEventListener("pageshow",fitScreen); [150,500,1200,2500].forEach(t=>setTimeout(fitScreen,t));
+if(window.visualViewport) visualViewport.addEventListener("resize",fitScreen);
 function setBranch(id){
   if(!BRANCHES[id] || id===branchId) return;
   branchId=id; try{ localStorage.setItem("hl_branch",id); }catch(e){} 
@@ -1054,11 +1067,15 @@ const supTitle=s=>s.pdfName||s.name;
 const r2=n=>Math.round(n*100)/100;
 let repPeriod="month";
 function repRange(){
-  const now=new Date(), d0=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-  if(repPeriod==="day") return [d0.getTime(),"היום · "+d0.toLocaleDateString("he-IL")];
-  if(repPeriod==="week"){ const w=new Date(d0); w.setDate(d0.getDate()-d0.getDay()); return [w.getTime(),"השבוע · מ־"+w.toLocaleDateString("he-IL")]; }
-  if(repPeriod==="month") return [new Date(now.getFullYear(),now.getMonth(),1).getTime(),"החודש · "+mLabel(mKey(now))];
-  if(repPeriod==="year") return [new Date(now.getFullYear(),0,1).getTime(),"השנה · "+now.getFullYear()];
+  // [from, until, label]
+  const now=new Date(), y=now.getFullYear(), mo=now.getMonth(), d0=new Date(y,mo,now.getDate()), D=86400000, END=8.64e15;
+  const ws=new Date(d0); ws.setDate(d0.getDate()-d0.getDay());
+  const f=d=>d.toLocaleDateString("he-IL");
+  if(repPeriod==="day") return [d0.getTime(),END,"היום · "+f(d0)];
+  if(repPeriod==="week") return [ws.getTime(),END,"השבוע · מ־"+f(ws)];
+  if(repPeriod==="lastweek"){ const a=new Date(ws.getTime()-7*D), b=new Date(ws.getTime()-D); return [a.getTime(),ws.getTime(),"השבוע שעבר · "+f(a)+"–"+f(b)]; }
+  if(repPeriod==="month") return [new Date(y,mo,1).getTime(),END,"החודש · "+mLabel(mKey(now))];
+  if(repPeriod==="lastmonth"){ const a=new Date(y,mo-1,1); return [a.getTime(),new Date(y,mo,1).getTime(),"החודש שעבר · "+mLabel(mKey(a))]; }
   return null;
 }
 function repPrev(){
@@ -1074,9 +1091,16 @@ function trendTxt(cur,prev,prevN){
   const pct=Math.round((cur-prev)/prev*100);
   return pct>0 ? "▲ "+pct+"%" : pct<0 ? "▼ "+Math.abs(pct)+"%" : "= 0%";
 }
+// the date(s) of a supplier's orders in the period: "8.11", or "6.11–8.11 (3)"
+function repDates(orders){
+  if(!orders.length) return "";
+  const f=ts=>{ const d=new Date(ts); return d.getDate()+"."+(d.getMonth()+1); };
+  const a=f(orders[0].ts), b=f(orders[orders.length-1].ts);
+  return (a===b ? a : a+"–"+b) + (orders.length>1 ? " ("+orders.length+")" : "");
+}
 function repData(){
   const month="all", sid=document.getElementById("repSup").value, rg=repRange();
-  const inP = o => rg ? o.ts>=rg[0] : (month==="all"||mKey(o.ts)===month);
+  const inP = o => rg ? (o.ts>=rg[0] && o.ts<rg[1]) : (month==="all"||mKey(o.ts)===month);
   const sups=repSups().filter(s=>sid==="all"||s.id===sid);
   const rows=sups.map(s=>{
     const h=load("hl_hist_"+dataKey(s),[]).filter(inP).sort((a,b)=>a.ts-b.ts);
@@ -1084,7 +1108,7 @@ function repData(){
     const ph=load("hl_hist_"+dataKey(s),[]).filter(o=>o.ts>=pv[0] && o.ts<pv[1] && o.total!=null);
     return {s, orders:h, n:h.length, prev:r2(ph.reduce((a,o)=>a+o.total,0)), prevN:ph.length, sum:r2(priced.reduce((a,o)=>a+o.total,0)), unpriced:h.length-priced.length, partial:priced.filter(o=>(o.items||[]).some(it=>it.price==null)).length};
   });
-  return {month, sid, rows, byMonth: rg ? repPeriod==="year" : month==="all", mlabel: rg ? rg[1] : (month==="all"?"כל החודשים":mLabel(month))};
+  return {month, sid, rows, byMonth: false, mlabel: rg ? rg[2] : (month==="all"?"כל החודשים":mLabel(month))};
 }
 function repModel(){
   const d=repData(), tables=[];
@@ -1093,10 +1117,10 @@ function repModel(){
   const sub="סניף "+branch().name+" · "+d.mlabel;
   if(d.sid==="all"){
     const shown=d.rows.filter(r=>r.n);
-    tables.push({name:"", head:["ספק","לפני מע״מ","כולל מע״מ"],
+    tables.push({name:"", head:["ספק","תאריך","לפני מע״מ","כולל מע״מ"],
       meta:shown.map(r=>({sid:r.s.id, s:r.s, orders:r.orders, partial:r.partial>0})),
-      rows:shown.map(r=>[supTitle(r.s), r.sum?money(r.sum):"אין מחירים", r.sum?money(r.sum*1.18):"אין מחירים"]),
-      total:["סה״כ", money(tot.sum), money(tot.sum*1.18)]});
+      rows:shown.map(r=>[supTitle(r.s), repDates(r.orders), r.sum?money(r.sum):"אין מחירים", r.sum?money(r.sum*1.18):"אין מחירים"]),
+      total:["סה״כ", "", money(tot.sum), money(tot.sum*1.18)]});
     if(d.byMonth){
       const byM={}; d.rows.forEach(r=>r.orders.forEach(o=>{ const k=mKey(o.ts); byM[k]=byM[k]||{n:0,sum:0}; byM[k].n++; if(o.total!=null) byM[k].sum+=o.total; }));
       const ks=Object.keys(byM).sort().reverse();
@@ -1106,12 +1130,10 @@ function repModel(){
     const r=d.rows[0], byP={};
     r.orders.forEach(o=>(o.items||[]).forEach(it=>{ const x=byP[it.id]||(byP[it.id]={name:it.name,q:0,amt:0,priced:false}); x.name=it.name||x.name; x.q+=Number(it.q)||0; if(it.price!=null){ x.amt+=(Number(it.q)||0)*it.price; x.priced=true; } }));
     const ps=Object.values(byP).sort((a,b)=>b.amt-a.amt||b.q-a.q);
-    tables.push({name:"", head:["מוצר","כמות","סכום לפני מע״מ"], rows:ps.map(x=>[x.name, String(r2(x.q)), x.priced?money(x.amt):"—"]),
-      total:["סה״כ", "", money(r.sum)]});
     const ords=r.orders.slice().reverse();
-    tables.push({name:"ההזמנות", head:["תאריך","לפני מע״מ","כולל מע״מ"],
+    tables.push({name:"", head:["הזמנה","לפני מע״מ","כולל מע״מ"],
       meta:ords.map(o=>({order:o, s:r.s, orders:[o], partial:o.total!=null && (o.items||[]).some(it=>it.price==null)})),
-      rows:ords.map(o=>{ const dt=new Date(o.ts); return [dt.toLocaleDateString("he-IL")+" "+fmtTime(dt), o.total!=null?money(o.total):"—", o.total!=null?money(o.total*1.18):"—"]; }), total:null});
+      rows:ords.map(o=>{ const dt=new Date(o.ts); return [dt.toLocaleDateString("he-IL")+" "+fmtTime(dt), o.total!=null?money(o.total):"—", o.total!=null?money(o.total*1.18):"—"]; }), total:ords.length>1?["סה״כ",money(r.sum),money(r.sum*1.18)]:null});
   }
   return {title, sub, n:tot.n, trend:trendTxt(tot.sum,tot.prev,tot.prevN), vsLabel:repPrev()[2], sum:tot.sum, unp:tot.unp, part:tot.part, tables};
 }
@@ -1130,7 +1152,7 @@ function renderReport(){
     const tagCol = !!(t.meta && t.meta.some(x=>x.partial)); if(tagCol){ const th=document.createElement("th"); th.className="tagc"; tr0.appendChild(th); }
     tb.appendChild(tr0);
     t.rows.forEach((r,i)=>{
-      const tr=document.createElement("tr"); r.forEach(x=>{ const td=document.createElement("td"); td.textContent=x; if(/^[▲▼=–]/.test(x)) td.className="trend "+trendCls(x); tr.appendChild(td); });
+      const tr=document.createElement("tr"); r.forEach((x,ci)=>{ const td=document.createElement("td"); td.textContent=x; if(/^[▲▼=–]/.test(x)) td.className="trend "+trendCls(x); if(ci>0 && t.head[ci]==="תאריך") td.className="dcol"; tr.appendChild(td); });
       if(tagCol){ const td=document.createElement("td"); td.className="tagc"; tr.appendChild(td); }
       const meta=t.meta && t.meta[i];
       if(meta){
@@ -1321,13 +1343,13 @@ function showReports(){
 }
 document.getElementById("repBtn").addEventListener("click",showReports);
 // set when the site file (index.html) is built
-const APP_BUILD="8.11.2026 · 22:10";
+const APP_BUILD="8.11.2026 · 22:49";
 document.getElementById("appVer").textContent = APP_BUILD.startsWith("__") ? "גרסת תצוגה (קישור Claude)" : "עדכון אחרון של האפליקציה: "+APP_BUILD;
 function repPerUI(){ document.querySelectorAll("#repPer button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.p===repPeriod?"true":"false")); }
 document.querySelectorAll("#repPer button").forEach(b=>b.addEventListener("click",()=>{ repPeriod=b.dataset.p; repPerUI(); renderReport(); }));
 document.getElementById("repSup").addEventListener("change",renderReport);
 document.getElementById("repBack").addEventListener("click",()=>{ pinOk=false; showHome(); });
-function repFileName(ext){ const m=repModel(); return ("דוח הלחמניא - "+branch().name+" - "+m.title.split("· ")[1]+" - "+repRange()[1].replace(" · "," ")).replace(/["״/\\]/g,"")+"."+ext; }
+function repFileName(ext){ const m=repModel(); return ("דוח הלחמניא - "+branch().name+" - "+m.title.split("· ")[1]+" - "+repRange()[2].replace(" · "," ").replace(/–/g,"-")).replace(/["״/\\]/g,"")+"."+ext; }
 async function deliverFile(blob,fname){
   const dl = window.claude && window.claude.use ? await window.claude.use('downloads') : null;
   if(dl){ await dl.save({filename:fname,data:blob}); return; }
@@ -1358,7 +1380,7 @@ document.getElementById("repPdf").addEventListener("click",async()=>{
     ctx.textAlign="left"; ctx.fillStyle=grey; ctx.font='400 26px "Assistant", sans-serif'; ctx.fillText("הופק "+new Date().toLocaleDateString("he-IL"),M,y); ctx.textAlign="right"; y+=30;
     ctx.fillStyle=green; ctx.fillRect(M,y,W-2*M,4); y+=60;
     ctx.fillStyle=ink; ctx.font='700 32px "Assistant", sans-serif';
-    ctx.fillText(m.n+" הזמנות  ·  לפני מע״מ "+money(m.sum)+"  ·  כולל מע״מ "+money(m.sum*1.18),W-M,y); y+=60;
+    ctx.fillText("לפני מע״מ "+money(m.sum)+"  ·  כולל מע״מ "+money(m.sum*1.18),W-M,y); y+=60;
     m.tables.forEach(t=>{
       if(!t.rows.length) return;
       const nc=t.head.length, colW=nc===4?[0,190,230,230]:[0,190,260];
