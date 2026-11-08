@@ -275,6 +275,10 @@ body.kp-open #supView header{padding-block:4px 6px}
   .cols,li{grid-template-columns:1fr 52px 66px 54px;gap:6px}
   input.num{font-size:16px}
 }
+/* the target column shows only in edit mode */
+#supView:not(.editing) .cols,#supView:not(.editing) #list li{grid-template-columns:1fr 76px 64px}
+#supView:not(.editing) .cols span:nth-child(2),#supView:not(.editing) #list li .target{display:none}
+@media (max-width:380px){#supView:not(.editing) .cols,#supView:not(.editing) #list li{grid-template-columns:1fr 66px 54px}}
 </style>
 </head>
 <body>
@@ -922,6 +926,7 @@ function render(){
   document.getElementById("supView").classList.toggle("editing-on",editing);
   const hc=document.querySelectorAll("#supView .cols span"); if(hc[3]) hc[3].textContent = editing ? tr().actsCol : tr().cols[3];
   list.classList.toggle("editing",editing);
+  document.getElementById("supView").classList.toggle("editing",editing);
   document.getElementById("pdfBtn").hidden=editing;
   document.getElementById("editDoneBtn").hidden=!editing;
   document.getElementById("editDoneBtn").textContent=tr().editFinish;
