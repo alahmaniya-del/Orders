@@ -86,6 +86,10 @@ header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var
 
 .cols{display:grid;grid-template-columns:1fr 64px 76px 64px;gap:8px;font-size:12px;letter-spacing:.04em;color:var(--muted);font-weight:700;padding:14px 0 6px}
 .cols span:not(:first-child){text-align:center}
+/* headings sit exactly over their columns (same inner padding as the product boxes) */
+.cols{padding-inline:11px;box-sizing:border-box}
+.cols span{text-align:center}
+.cols span:first-child{text-align:start}
 ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
 li{display:grid;grid-template-columns:1fr 64px 76px 64px;gap:8px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px}
 li.has-order{border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
@@ -164,8 +168,13 @@ li.unmarked .name::after{content:attr(data-miss);display:block;font-size:13px;fo
 .pin-row button{font:inherit;font-weight:800;font-size:15px;border:1px solid var(--line);border-radius:10px;padding:10px 14px;cursor:pointer}
 .pin-err{min-height:1.2em;font-size:13px;font-weight:800;color:var(--err)}
 .pin-ask.shake{animation:shake .35s}
+/* the code box floats above the order (nothing moves or hides), near the top so the phone keyboard never covers it */
+#pinAsk{position:fixed;z-index:60;top:calc(env(safe-area-inset-top,0px) + 72px);left:50%;transform:translateX(-50%);width:min(380px,calc(100% - 32px));box-sizing:border-box;margin:0;padding:18px 16px;border-radius:16px;box-shadow:0 0 0 100vmax rgba(15,25,20,.45),0 12px 32px rgba(0,0,0,.25)}
+#pinAsk.shake{animation:pinshake .35s}
+@keyframes pinshake{0%,100%{transform:translateX(-50%)}20%,60%{transform:translateX(calc(-50% - 6px))}40%,80%{transform:translateX(calc(-50% + 6px))}}
 #list.editing li{background:color-mix(in srgb,var(--card) 70%,var(--ink) 30%)}
-#list.editing input[id^="v_"]{opacity:.35}
+#list.editing input[id^="v_"]{opacity:.6;display:block;width:64px;margin-inline:auto;font-size:18px;border-width:2px}
+@media (max-width:380px){#list.editing input[id^="v_"]{width:52px;font-size:16px}}
 #list.editing .name{opacity:1}
 #list.editing .name > :not(.price-edit):not(.namein){opacity:.6}
 #list.editing .target{opacity:1}
@@ -642,8 +651,10 @@ function applyLang(){
 
 const todayKey = () => { const d=new Date(); return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate(); };
 const fmtDate = d => d.toLocaleDateString("he-IL",{weekday:"long",day:"numeric",month:"numeric",year:"numeric"});
-const load = (k,f)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):f}catch(e){return f}};
-const save = (k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){} try{syncMark(k)}catch(e){}};
+// a memory copy keeps today's work even where the browser does not keep storage (some in-app viewers)
+const MEM = {};
+const load = (k,f)=>{ let v=null; try{ v=localStorage.getItem(k); }catch(e){} if(v==null && (k in MEM)) v=MEM[k]; try{ return v?JSON.parse(v):f; }catch(e){ return f; } };
+const save = (k,v)=>{ const s=JSON.stringify(v); MEM[k]=s; try{localStorage.setItem(k,s)}catch(e){} try{syncMark(k)}catch(e){} };
 // shared between all phones: order history, targets, prices, names, added / hidden / removed products
 var SYNC_DB="https://halechmania-orders-default-rtdb.europe-west1.firebasedatabase.app/shops/halechmania-rishon";
 var syncRe=/^hl_(hist|histreset|targets|prices|names|extra|hidden|removed)_/;
@@ -820,6 +831,8 @@ brPinIn.addEventListener("input",()=>{
   }
 });
 function showHome(){
+  // leaving a supplier starts its next order clean
+  if(cur) save("hl_day_"+dataKey(cur),{date:todayKey(),vals:{},note:""});
   cur=null; editing=false; pinOk=false; closeKeypad(); L="he"; applyLang();
   supView.hidden=true; bar.hidden=true; homeView.hidden=false; document.getElementById("homeBg").hidden=false; document.body.classList.add("on-home"); document.getElementById("histView").hidden=true;
   const tiles=document.getElementById("tiles"); tiles.innerHTML="";
@@ -1091,7 +1104,7 @@ pinIn.addEventListener("input",()=>{
     try{ navigator.vibrate && navigator.vibrate(120); }catch(_){}
   }
 });
-document.getElementById("editDoneBtn").addEventListener("click",()=>{ if(editing){ document.getElementById("editBtn").click(); window.scrollTo(0,0); } });
+document.getElementById("editDoneBtn").addEventListener("click",()=>{ if(editing){ const y=window.scrollY; document.getElementById("editBtn").click(); window.scrollTo(0,y); } });
 document.getElementById("pinNo").addEventListener("click",()=>{ pinAsk.hidden=true; pinIn.blur(); });
 document.getElementById("editBtn").addEventListener("click",e=>{ editing=!editing; if(!editing) pinOk=false; e.target.textContent=editing?tr().editDone:tr().edit; render(); });
 const clearBtn=document.getElementById("clearBtn"), clearAsk=document.getElementById("clearAsk");
