@@ -72,6 +72,34 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
 .rep-empty{margin:24px 0;text-align:center;color:var(--muted);font-weight:700}
 .rep-note{font-size:12px;color:var(--muted);margin-top:6px}
 .rep-note.warn{color:var(--warn);font-weight:800}
+.rep-t tr.open td{background:color-mix(in srgb,var(--accent) 8%,var(--card))}
+.rep-amt{all:unset;cursor:pointer;color:var(--accent);font-weight:800;text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.rep-nf{all:unset;cursor:pointer;font-size:11px;font-weight:800;color:var(--warn);margin-inline-end:5px;text-decoration:underline dotted;text-underline-offset:3px;white-space:nowrap}
+.rep-per{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:4px 0 0}
+.rep-per button{font:inherit;font-weight:800;font-size:15px;padding:9px 4px;border-radius:10px;border:1px solid var(--line);background:var(--field);color:var(--ink);cursor:pointer}
+.rep-per button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.rep-ctrl select.inactive{opacity:.55}
+.np-dlg{width:min(380px,100%);max-height:80vh;overflow:auto}
+.np-sub{font-size:13px;color:var(--muted);font-weight:700;margin-top:-4px}
+.np-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid var(--line)}
+.np-name{font-weight:700;min-width:0}
+.np-edit{all:unset;cursor:pointer;display:flex;align-items:center;gap:4px;font-size:13px;font-weight:800;color:var(--warn);white-space:nowrap}
+.np-in{display:flex;gap:6px;align-items:center}
+.np-in input{width:76px;font:inherit;font-size:16px;font-weight:700;text-align:center;padding:7px;border-radius:8px;border:1.5px solid var(--warn);background:var(--field);color:var(--ink)}
+.np-in input.bad{border-color:var(--err)}
+.np-ok{font:inherit;font-weight:800;font-size:14px;border:0;border-radius:8px;padding:8px 12px;background:var(--accent);color:var(--accent-ink);cursor:pointer}
+.np-set{font-weight:800;color:var(--ok);white-space:nowrap}
+.np-done{padding:14px 0;text-align:center;font-weight:700;color:var(--ok)}
+.np-close{font:inherit;font-weight:800;font-size:16px;border:0;border-radius:12px;padding:12px;background:var(--accent);color:var(--accent-ink);cursor:pointer;margin-top:6px}
+.rep-det td{padding:6px 10px 12px;background:var(--field);text-align:start}
+.rep-items{width:100%;border-collapse:collapse;font-size:13px}
+.rep-items td{padding:5px 4px;border-bottom:1px dashed var(--line);text-align:start}
+.rep-items td:nth-child(2){color:var(--muted);white-space:nowrap}
+.rep-items td:last-child{text-align:end;white-space:nowrap;font-weight:700}
+.rep-items td.nop{color:var(--warn)}
+.rep-dt{display:flex;justify-content:space-between;font-size:13px;padding:4px 4px 0}
+.rep-dt.g{font-weight:800}
+.rep-dn{font-size:12px;color:var(--muted);margin-top:6px}
 .rep-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:22px}
 .rep-btn{font:inherit;font-weight:800;font-size:16px;border:0;border-radius:12px;padding:14px;background:var(--accent);color:var(--accent-ink);cursor:pointer}
 .rep-btn.ghost{background:none;color:var(--accent);border:1.5px solid var(--accent)}
@@ -136,7 +164,7 @@ li.unmarked .name::after{content:attr(data-miss);display:block;font-size:13px;fo
 .hist details{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
 .hist summary{list-style:none;cursor:pointer;display:flex;gap:10px;align-items:center;padding:14px 14px}
 .hist summary::-webkit-details-marker{display:none}
-.hist .when{font-weight:800;flex:1;min-width:0}
+.hist .when{font-weight:800;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hist .n{font-size:13px;font-weight:700;color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:3px 10px;white-space:nowrap;font-variant-numeric:tabular-nums}
 .hist .chev{color:var(--muted);transition:transform .15s}
 .hist details[open] .chev{transform:rotate(180deg)}
@@ -412,6 +440,12 @@ body.kp-open #supView header{padding-block:4px 6px}
       <label>חודש<select id="repMonth"></select></label>
       <label>ספק<select id="repSup"></select></label>
     </div>
+    <div class="rep-per" id="repPer" role="group" aria-label="תקופה">
+      <button type="button" data-p="day">היום</button>
+      <button type="button" data-p="week">השבוע</button>
+      <button type="button" data-p="month">החודש</button>
+      <button type="button" data-p="year">השנה</button>
+    </div>
     <div id="repOut"></div>
     <div class="rep-actions">
       <button type="button" class="rep-btn" id="repPdf">שתף PDF</button>
@@ -420,6 +454,15 @@ body.kp-open #supView header{padding-block:4px 6px}
     <div class="rep-status" id="repStatus" role="status"></div>
     <div class="app-ver" id="appVer"></div>
   </section>
+
+  <div class="dlg-back" id="npDlg" hidden>
+    <div class="dlg np-dlg" role="dialog" aria-modal="true" aria-labelledby="npQ">
+      <div class="dlg-q" id="npQ">מוצרים בלי מחיר</div>
+      <div class="np-sub" id="npSub"></div>
+      <div id="npList"></div>
+      <button type="button" class="np-close" id="npClose">סגור</button>
+    </div>
+  </div>
 
   <div class="dlg-back" id="dlg" hidden>
     <div class="dlg" role="dialog" aria-modal="true" aria-labelledby="dlgQ">
@@ -709,6 +752,7 @@ const load = (k,f)=>{ let v=null; try{ v=localStorage.getItem(k); }catch(e){} if
 const save = (k,v)=>{ const s=JSON.stringify(v); MEM[k]=s; try{localStorage.setItem(k,s)}catch(e){} try{syncMark(k)}catch(e){} };
 // shared between all phones: order history, targets, prices, names, added / hidden / removed products
 var SYNC_DB="https://halechmania-orders-default-rtdb.europe-west1.firebasedatabase.app/shops/halechmania-rishon";
+var OP_RE_S=/^hl_(targets|prices|names|extra|hidden|removed)_/;
 var syncRe=/^hl_(hist|histreset|targets|prices|names|extra|hidden|removed)_/;
 function syncGet(k,f){try{const v=localStorage.getItem(k);return v?JSON.parse(v):f}catch(e){return f}}
 function syncPut(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
@@ -785,7 +829,21 @@ async function syncPull(){
     if(JSON.stringify(merged)!==JSON.stringify(local)){ syncPut(k,merged); changed=true; }
   });
   syncPut("hl_sync_meta",meta); syncPut("hl_sync_pending",pend);
-  if(Object.keys(pend).length) syncSoon();
+  // changes made in the Claude link, carried by this site file: applied once for everyone
+  const seedDone=data.seeds||{}, seedMark={};
+  SEED_OPS.slice().sort((a,b)=>a.t-b.t).forEach(o=>{
+    const id=(o.k+"__"+o.f+"@"+o.t).replace(/[.#$\[\]\/]/g,"_");
+    if(seedDone[id] || !OP_RE_S.test(o.k)) return;
+    const kind=o.k.match(OP_RE_S)[1];
+    let v=null; try{ v=o.v==null?null:JSON.parse(o.v); }catch(e){ return; }
+    if(kind==="extra"){ const a=syncGet(o.k,[]).filter(x=>x.id!==o.f); if(o.op==="set" && v) a.push(v); save(o.k,a); }
+    else if(kind==="hidden"||kind==="removed"){ const a=syncGet(o.k,[]).filter(x=>String(x)!==o.f); if(o.op==="set") a.push(o.f); save(o.k,a); }
+    else { const m=syncGet(o.k,{}); if(o.op==="set") m[o.f]=v; else delete m[o.f]; save(o.k,m);
+      if(kind==="prices" && o.op==="set" && v!=null){ const sp=SUPPLIERS.find(s=>!s.base && "hl_prices_"+dataKey(s)===o.k); if(sp) fillHistPrice(sp,o.f,v); } }
+    seedMark[id]=true; changed=true;
+  });
+  if(Object.keys(seedMark).length) fetch(SYNC_DB+"/seeds.json",{method:"PATCH",body:JSON.stringify(seedMark)}).catch(()=>{});
+  if(Object.keys(syncGet("hl_sync_pending",{})).length) syncSoon();
   if(changed) syncRefresh();
 }
 function syncRefresh(){
@@ -800,6 +858,9 @@ setTimeout(syncPull,600);
 setInterval(()=>{ if(!document.hidden) syncPull(); },20000);
 document.addEventListener("visibilitychange",()=>{ if(!document.hidden) syncPull(); });
 window.addEventListener("online",()=>{ syncFlush(); syncPull(); });
+// changes made in the Claude link that the next site file (index.html) carries to every phone (filled when the site is built)
+const SEED_OPS=[{"k": "hl_prices_cocacola", "f": "c11", "op": "set", "v": "69.69", "t": 1794165250078}];
+
 // one-time clean start: removes order history and today's counts once per phone (targets, prices and products stay)
 (function(){
   const K="hl_reset_mark", V="clean-2026-11-07";
@@ -857,7 +918,7 @@ let cur=null, st=null, editing=false, pendingPriceFocus=null;
 
 function setBranch(id){
   if(!BRANCHES[id] || id===branchId) return;
-  branchId=id; try{ localStorage.setItem("hl_branch",id); }catch(e){}
+  branchId=id; try{ localStorage.setItem("hl_branch",id); }catch(e){} 
   // products added in the other branch are not part of this one
   SUPPLIERS.forEach(s=>{ if(s.base) return; for(let i=s.products.length-1;i>=0;i--) if(s.products[i].custom) s.products.splice(i,1); });
   showHome();
@@ -909,15 +970,25 @@ const mLabel=k=>{ const [y,m]=k.split("-"); return HE_MONTHS[+m-1]+" "+y; };
 const repSups=()=>branch().tiles.map(id=>SUPPLIERS.find(s=>s.id===id)).filter(s=>s && !s.base);
 const supTitle=s=>s.pdfName||s.name;
 const r2=n=>Math.round(n*100)/100;
+let repPeriod="month";
+function repRange(){
+  const now=new Date(), d0=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  if(repPeriod==="day") return [d0.getTime(),"היום · "+d0.toLocaleDateString("he-IL")];
+  if(repPeriod==="week"){ const w=new Date(d0); w.setDate(d0.getDate()-d0.getDay()); return [w.getTime(),"השבוע · מ־"+w.toLocaleDateString("he-IL")]; }
+  if(repPeriod==="month") return [new Date(now.getFullYear(),now.getMonth(),1).getTime(),"החודש · "+mLabel(mKey(now))];
+  if(repPeriod==="year") return [new Date(now.getFullYear(),0,1).getTime(),"השנה · "+now.getFullYear()];
+  return null;
+}
 function repData(){
-  const month=document.getElementById("repMonth").value, sid=document.getElementById("repSup").value;
+  const month=document.getElementById("repMonth").value, sid=document.getElementById("repSup").value, rg=repRange();
+  const inP = o => rg ? o.ts>=rg[0] : (month==="all"||mKey(o.ts)===month);
   const sups=repSups().filter(s=>sid==="all"||s.id===sid);
   const rows=sups.map(s=>{
-    const h=load("hl_hist_"+dataKey(s),[]).filter(o=>month==="all"||mKey(o.ts)===month).sort((a,b)=>a.ts-b.ts);
+    const h=load("hl_hist_"+dataKey(s),[]).filter(inP).sort((a,b)=>a.ts-b.ts);
     const priced=h.filter(o=>o.total!=null);
     return {s, orders:h, n:h.length, sum:r2(priced.reduce((a,o)=>a+o.total,0)), unpriced:h.length-priced.length, partial:priced.filter(o=>(o.items||[]).some(it=>it.price==null)).length};
   });
-  return {month, sid, rows, mlabel: month==="all"?"כל החודשים":mLabel(month)};
+  return {month, sid, rows, byMonth: rg ? repPeriod==="year" : month==="all", mlabel: rg ? rg[1] : (month==="all"?"כל החודשים":mLabel(month))};
 }
 function repModel(){
   const d=repData(), tables=[];
@@ -925,10 +996,12 @@ function repModel(){
   const title="דוח הזמנות · "+(d.sid==="all"?"כל הספקים":supTitle(d.rows[0].s));
   const sub="סניף "+branch().name+" · "+d.mlabel;
   if(d.sid==="all"){
-    tables.push({name:"לפי ספק", head:["ספק","הזמנות","לפני מע״מ","כולל מע״מ"],
-      rows:d.rows.filter(r=>r.n).map(r=>[supTitle(r.s), String(r.n), r.sum?money(r.sum):"אין מחירים", r.sum?money(r.sum*1.18):"אין מחירים"]),
+    const shown=d.rows.filter(r=>r.n);
+    tables.push({name:"", head:["ספק","הזמנות","לפני מע״מ","כולל מע״מ"],
+      meta:shown.map(r=>({sid:r.s.id, s:r.s, orders:r.orders, partial:r.partial>0})),
+      rows:shown.map(r=>[supTitle(r.s), String(r.n), r.sum?money(r.sum):"אין מחירים", r.sum?money(r.sum*1.18):"אין מחירים"]),
       total:["סה״כ", String(tot.n), money(tot.sum), money(tot.sum*1.18)]});
-    if(d.month==="all"){
+    if(d.byMonth){
       const byM={}; d.rows.forEach(r=>r.orders.forEach(o=>{ const k=mKey(o.ts); byM[k]=byM[k]||{n:0,sum:0}; byM[k].n++; if(o.total!=null) byM[k].sum+=o.total; }));
       const ks=Object.keys(byM).sort().reverse();
       if(ks.length) tables.push({name:"לפי חודש", head:["חודש","הזמנות","לפני מע״מ","כולל מע״מ"], rows:ks.map(k=>[mLabel(k),String(byM[k].n),byM[k].sum?money(byM[k].sum):"—",byM[k].sum?money(byM[k].sum*1.18):"—"]), total:null});
@@ -939,7 +1012,10 @@ function repModel(){
     const ps=Object.values(byP).sort((a,b)=>b.amt-a.amt||b.q-a.q);
     tables.push({name:"לפי מוצר", head:["מוצר","כמות","סכום לפני מע״מ"], rows:ps.map(x=>[x.name, String(r2(x.q)), x.priced?money(x.amt):"—"]),
       total:["סה״כ", "", money(r.sum)]});
-    tables.push({name:"ההזמנות", head:["תאריך","מוצרים","לפני מע״מ"], rows:r.orders.slice().reverse().map(o=>{ const dt=new Date(o.ts); return [dt.toLocaleDateString("he-IL")+" "+fmtTime(dt), String((o.items||[]).length), o.total!=null?money(o.total):"—"]; }), total:null});
+    const ords=r.orders.slice().reverse();
+    tables.push({name:"ההזמנות", head:["תאריך","מוצרים","לפני מע״מ"],
+      meta:ords.map(o=>({order:o, s:r.s, orders:[o], partial:o.total!=null && (o.items||[]).some(it=>it.price==null)})),
+      rows:ords.map(o=>{ const dt=new Date(o.ts); return [dt.toLocaleDateString("he-IL")+" "+fmtTime(dt), String((o.items||[]).length), o.total!=null?money(o.total):"—"]; }), total:null});
   }
   return {title, sub, n:tot.n, sum:tot.sum, unp:tot.unp, part:tot.part, tables};
 }
@@ -951,17 +1027,97 @@ function renderReport(){
   if(!m.n){ const e=document.createElement("div"); e.className="rep-empty"; e.textContent="אין הזמנות בתקופה הזו."; out.appendChild(e); }
   else m.tables.forEach(t=>{
     if(!t.rows.length) return;
-    const h=document.createElement("h2"); h.className="rep-h"; h.textContent=t.name; out.appendChild(h);
+    if(t.name){ const h=document.createElement("h2"); h.className="rep-h"; h.textContent=t.name; out.appendChild(h); }
     const tb=document.createElement("table"); tb.className="rep-t";
     const tr0=document.createElement("tr"); t.head.forEach(x=>{ const th=document.createElement("th"); th.textContent=x; tr0.appendChild(th); }); tb.appendChild(tr0);
-    t.rows.forEach(r=>{ const tr=document.createElement("tr"); r.forEach(x=>{ const td=document.createElement("td"); td.textContent=x; tr.appendChild(td); }); tb.appendChild(tr); });
+    t.rows.forEach((r,i)=>{
+      const tr=document.createElement("tr"); r.forEach(x=>{ const td=document.createElement("td"); td.textContent=x; tr.appendChild(td); });
+      const meta=t.meta && t.meta[i];
+      if(meta){
+        // the amount opens the invoice; "לא סופי" (beside it) opens the products that have no price
+        const cell=tr.children[2], amt=document.createElement("button"); amt.type="button"; amt.className="rep-amt"; amt.textContent=cell.textContent; cell.textContent="";
+        amt.addEventListener("click",()=>{ if(meta.sid){ document.getElementById("repSup").value=meta.sid; renderReport(); window.scrollTo(0,0); } else toggleOrder(tr,meta.order,r.length); });
+        cell.appendChild(amt);
+        if(meta.partial){ const nf=document.createElement("button"); nf.type="button"; nf.className="rep-nf"; nf.textContent="לא סופי"; nf.addEventListener("click",()=>openMissing(meta)); cell.prepend(nf); }
+      }
+      tb.appendChild(tr);
+    });
     if(t.total){ const tr=document.createElement("tr"); tr.className="tot"; t.total.forEach(x=>{ const td=document.createElement("td"); td.textContent=x; tr.appendChild(td); }); tb.appendChild(tr); }
     out.appendChild(tb);
   });
-  if(m.part){ const n=document.createElement("div"); n.className="rep-note warn"; n.textContent="סכום לא סופי: "+(m.part===1?"בהזמנה אחת":"ב־"+m.part+" הזמנות")+" יש מוצרים בלי מחיר, והם לא נכללו בסכום."; out.appendChild(n); }
   if(m.unp){ const n=document.createElement("div"); n.className="rep-note"; n.textContent="הזמנות של ספקים בלי מחירים נספרות, אבל לא נכנסות לסכום ("+m.unp+"). כדי לראות מה הוזמן מהם, בחר את הספק ברשימה למעלה."; out.appendChild(n); }
   document.getElementById("repPdf").disabled=!m.n; document.getElementById("repCsv").disabled=!m.n;
   document.getElementById("repStatus").textContent="";
+}
+// "לא סופי": list the products without a price, each with a pencil to set it
+function missingItems(meta){
+  const m={}; meta.orders.forEach(o=>{ if(o.total==null && meta.sid) return; (o.items||[]).forEach(it=>{ if(it.price==null && !m[it.id]) m[it.id]=it.name; }); });
+  return Object.entries(m);
+}
+function setMissingPrice(s,id,v){
+  const key=dataKey(s), pr=load("hl_prices_"+key,{}); pr[id]=v; save("hl_prices_"+key,pr);
+  const p=s.products.find(x=>x.id===id); if(p) p.price=v;
+  fillHistPrice(s,id,v);
+}
+// orders that were sent without this price get it now, so their totals become final
+function fillHistPrice(s,id,v){
+  const key=dataKey(s), h=load("hl_hist_"+key,[]); let ch=false;
+  h.forEach(o=>{ let hit=false; (o.items||[]).forEach(it=>{ if(it.id===id && it.price==null){ it.price=v; hit=true; } });
+    if(hit){ ch=true; const pi=(o.items||[]).filter(it=>it.price!=null); o.total=Math.round(pi.reduce((a,it)=>a+it.price*(Number(it.q)||0),0)*100)/100; } });
+  if(ch) save("hl_hist_"+key,h);
+}
+function openMissing(meta){
+  const list=document.getElementById("npList"); list.innerHTML="";
+  document.getElementById("npSub").textContent=supTitle(meta.s)+" · עדכון מחיר לפני מע״מ";
+  const items=missingItems(meta);
+  if(!items.length){ const e=document.createElement("div"); e.className="np-done"; e.textContent="לכל המוצרים יש מחיר ✓"; list.appendChild(e); }
+  items.forEach(([id,name])=>{
+    const row=document.createElement("div"); row.className="np-row";
+    const nm=document.createElement("span"); nm.className="np-name"; nm.textContent=name;
+    const ed=document.createElement("button"); ed.type="button"; ed.className="np-edit"; ed.innerHTML='<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25Zm17.71-10.21a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83Z"/></svg> עדכן מחיר';
+    ed.addEventListener("click",()=>{
+      const box=document.createElement("span"); box.className="np-in";
+      const inp=document.createElement("input"); inp.type="text"; inp.inputMode="decimal"; inp.placeholder="₪"; inp.setAttribute("aria-label","מחיר "+name);
+      const ok=document.createElement("button"); ok.type="button"; ok.className="np-ok"; ok.textContent="שמור";
+      const go=()=>{ const v=parseFloat(String(inp.value).replace(",",".")); if(!(v>0)){ inp.classList.add("bad"); inp.focus(); return; }
+        setMissingPrice(meta.s,id,Math.round(v*100)/100);
+        row.classList.add("saved"); row.innerHTML=""; const d=document.createElement("span"); d.className="np-name"; d.textContent=name; const t=document.createElement("span"); t.className="np-set"; t.textContent="✓ "+money(Math.round(v*100)/100); row.append(d,t);
+        renderReport(); };
+      ok.addEventListener("click",go); inp.addEventListener("keydown",e=>{ if(e.key==="Enter") go(); });
+      box.append(inp,ok); ed.replaceWith(box); inp.focus();
+    });
+    row.append(nm,ed); list.appendChild(row);
+  });
+  document.getElementById("npDlg").hidden=false;
+}
+document.getElementById("npClose").addEventListener("click",()=>{ document.getElementById("npDlg").hidden=true; });
+document.getElementById("npDlg").addEventListener("click",e=>{ if(e.target.id==="npDlg") e.target.hidden=true; });
+
+// tap an order in the report: open its full details right under it
+function toggleOrder(tr,o,cols){
+  const nx=tr.nextElementSibling;
+  if(nx && nx.classList.contains("rep-det")){ nx.remove(); tr.classList.remove("open"); return; }
+  tr.parentElement.querySelectorAll("tr.rep-det").forEach(x=>{ x.previousElementSibling && x.previousElementSibling.classList.remove("open"); x.remove(); });
+  const dr=document.createElement("tr"); dr.className="rep-det"; const td=document.createElement("td"); td.colSpan=cols;
+  const t=document.createElement("table"); t.className="rep-items";
+  (o.items||[]).forEach(it=>{
+    const r=document.createElement("tr");
+    const a=document.createElement("td"); a.textContent=it.name;
+    const b=document.createElement("td"); b.textContent = it.price!=null ? it.q+" × "+money(it.price) : it.q;
+    const c=document.createElement("td"); if(it.price!=null) c.textContent=money(it.q*it.price); else { c.textContent="חסר מחיר"; c.className="nop"; }
+    r.append(a,b,c); t.appendChild(r);
+  });
+  td.appendChild(t);
+  if(o.total!=null){
+    const vat=Math.round(o.total*VAT*100)/100;
+    [["לפני מע״מ",o.total],["מע״מ 18%",vat],["כולל מע״מ",Math.round((o.total+vat)*100)/100]].forEach(([l,v],i)=>{
+      const row=document.createElement("div"); row.className="rep-dt"+(i===2?" g":"");
+      const x=document.createElement("span"); x.textContent=l; const y=document.createElement("span"); y.textContent=money(v);
+      row.append(x,y); td.appendChild(row);
+    });
+  }
+  if(o.note){ const n=document.createElement("div"); n.className="rep-dn"; n.textContent="הערה: "+o.note; td.appendChild(n); }
+  dr.appendChild(td); tr.after(dr); tr.classList.add("open");
 }
 function showReports(){
   closeKeypad();
@@ -976,16 +1132,19 @@ function showReports(){
   mSel.add(new Option("כל החודשים","all")); mSel.value=now;
   const sSel=document.getElementById("repSup"); sSel.innerHTML=""; sSel.add(new Option("כל הספקים","all"));
   repSups().forEach(s=>sSel.add(new Option(supTitle(s),s.id)));
+  repPeriod="month"; repPerUI();
   renderReport(); window.scrollTo(0,0);
 }
 document.getElementById("repBtn").addEventListener("click",showReports);
 // set when the site file (index.html) is built
-const APP_BUILD="8.11.2026 · 18:38";
+const APP_BUILD="8.11.2026 · 21:17";
 document.getElementById("appVer").textContent = APP_BUILD.startsWith("__") ? "גרסת תצוגה (קישור Claude)" : "עדכון אחרון של האפליקציה: "+APP_BUILD;
-document.getElementById("repMonth").addEventListener("change",renderReport);
+function repPerUI(){ document.querySelectorAll("#repPer button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.p===repPeriod?"true":"false")); document.getElementById("repMonth").classList.toggle("inactive",!!repPeriod); }
+document.querySelectorAll("#repPer button").forEach(b=>b.addEventListener("click",()=>{ repPeriod=b.dataset.p; repPerUI(); renderReport(); }));
+document.getElementById("repMonth").addEventListener("change",()=>{ repPeriod=null; repPerUI(); renderReport(); });
 document.getElementById("repSup").addEventListener("change",renderReport);
 document.getElementById("repBack").addEventListener("click",()=>{ pinOk=false; showHome(); });
-function repFileName(ext){ const m=repModel(); return ("דוח הלחמניא - "+branch().name+" - "+m.title.split("· ")[1]+" - "+document.getElementById("repMonth").selectedOptions[0].text).replace(/["״/\\]/g,"")+"."+ext; }
+function repFileName(ext){ const m=repModel(); return ("דוח הלחמניא - "+branch().name+" - "+m.title.split("· ")[1]+" - "+(repRange()?repRange()[1].split(" · ")[0]+" "+repRange()[1].split(" · ")[1]:document.getElementById("repMonth").selectedOptions[0].text)).replace(/["״/\\]/g,"")+"."+ext; }
 async function deliverFile(blob,fname){
   const dl = window.claude && window.claude.use ? await window.claude.use('downloads') : null;
   if(dl){ await dl.save({filename:fname,data:blob}); return; }
@@ -998,7 +1157,7 @@ const repErr=e=>{ const c=e&&(e.code||e.name); repSay(c==="declined"||c==="Abort
 document.getElementById("repCsv").addEventListener("click",async()=>{
   const m=repModel(); const q=v=>{ const t=String(v).replace(/[\u2066-\u2069]/g,""); const mm=t.match(/^₪ ([\d,]+(?:\.\d+)?)$/); return mm ? mm[1].replace(/,/g,"") : '"'+t.replace(/"/g,'""')+'"'; };
   const lines=[[m.title],[m.sub],[]];
-  m.tables.forEach(t=>{ if(!t.rows.length) return; lines.push([t.name]); lines.push(t.head); t.rows.forEach(r=>lines.push(r)); if(t.total) lines.push(t.total); lines.push([]); });
+  m.tables.forEach(t=>{ if(!t.rows.length) return; if(t.name) lines.push([t.name]); lines.push(t.head); t.rows.forEach(r=>lines.push(r)); if(t.total) lines.push(t.total); lines.push([]); });
   const csv="\uFEFF"+lines.map(r=>r.map(q).join(",")).join("\r\n");
   try{ repSay("מכין קובץ…"); await deliverFile(new Blob([csv],{type:"text/csv"}),repFileName("csv")); repSay("הקובץ מוכן"); }catch(e){ repErr(e); }
 });
@@ -1022,7 +1181,7 @@ document.getElementById("repPdf").addEventListener("click",async()=>{
       const nc=t.head.length, colW=nc===4?[0,190,230,230]:[0,190,260];
       const xs=[]; let x=M; for(let i=nc-1;i>=1;i--){ xs[i]=x+colW[i]/2; x+=colW[i]; }
       const row=(cells,font,color)=>{ ctx.font=font; ctx.fillStyle=color; ctx.textAlign="right"; const nm=String(cells[0]); let tx=nm; while(ctx.measureText(tx).width>W-2*M-x+M-20 && tx.length>3) tx=tx.slice(0,-2); ctx.fillText(tx===nm?nm:tx+"…",W-M,y); ctx.textAlign="center"; for(let i=1;i<nc;i++) ctx.fillText(String(cells[i]),xs[i],y); ctx.textAlign="right"; };
-      need(150); ctx.fillStyle=green; ctx.font='38px "Secular One", "Assistant", sans-serif'; ctx.fillText(t.name,W-M,y); y+=48;
+      need(150); if(t.name){ ctx.fillStyle=green; ctx.font='38px "Secular One", "Assistant", sans-serif'; ctx.fillText(t.name,W-M,y); y+=48; }
       row(t.head,'700 24px "Assistant", sans-serif',grey); y+=16; ctx.fillStyle=line; ctx.fillRect(M,y,W-2*M,2); y+=40;
       t.rows.forEach(r=>{ need(50); row(r,'400 28px "Assistant", sans-serif',ink); y+=14; ctx.fillStyle=line; ctx.fillRect(M,y,W-2*M,1); y+=38; });
       if(t.total){ need(50); row(t.total,'700 28px "Assistant", sans-serif',green); y+=52; }
@@ -1305,7 +1464,9 @@ pinIn.addEventListener("input",()=>{
 });
 document.getElementById("editDoneBtn").addEventListener("click",()=>{ if(editing){ const y=window.scrollY; document.getElementById("editBtn").click(); window.scrollTo(0,y); } });
 document.getElementById("pinNo").addEventListener("click",()=>{ pinAsk.hidden=true; pinIn.blur(); });
-document.getElementById("editBtn").addEventListener("click",e=>{ editing=!editing; if(!editing) pinOk=false; e.target.textContent=editing?tr().editDone:tr().edit; render(); });
+document.getElementById("editBtn").addEventListener("click",e=>{ editing=!editing;
+  if(!editing && cur) Object.entries(st.prices||{}).forEach(([id,v])=>{ if(v!=null) fillHistPrice(cur,id,v); });
+  if(!editing) pinOk=false; e.target.textContent=editing?tr().editDone:tr().edit; render(); });
 const clearBtn=document.getElementById("clearBtn"), clearAsk=document.getElementById("clearAsk");
 clearBtn.addEventListener("click",()=>{
   closeKeypad();
@@ -1435,7 +1596,7 @@ function showHistory(){
     const w=document.createElement("span"); w.className="when";
     w.textContent=new Date(o.ts).toLocaleString(tr().locale,{weekday:"short",day:"numeric",month:"numeric",year:"2-digit",hour:"2-digit",minute:"2-digit"});
     const n=document.createElement("span"); n.className="n"; const part=partialOf(o);
-    n.textContent=tr().histCount(o.items.length)+(o.total!=null?" · "+money(o.total)+(part?" · "+tr().notFinalShort:""):" · "+tr().noPricesShort);
+    n.textContent = part ? tr().notFinalShort : tr().histCount(o.items.length)+(o.total!=null?" · "+money(o.total):" · "+tr().noPricesShort);
     if(part||o.total==null) n.classList.add("partial");
     const c=document.createElement("span"); c.className="chev"; c.textContent="▾";
     sm.append(w,n,c); d.appendChild(sm);
