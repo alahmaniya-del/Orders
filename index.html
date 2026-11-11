@@ -113,6 +113,59 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
 .np-up{margin-top:22px;margin-bottom:-4px}
 .np-msg:empty{display:none}
 .np-dlg{position:relative}
+.home-gear[hidden]{display:none}
+.home-gear.doc-ic{inset-inline-end:auto;inset-inline-start:-6px}
+#docView{box-sizing:border-box;min-height:calc(100vh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));min-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;padding-bottom:max(16px,env(safe-area-inset-bottom,0px))}
+#docView[hidden]{display:none}
+.doc-scan{margin-top:12px;min-height:54px;font-size:17px!important;background:var(--accent)!important;color:var(--accent-ink)!important}
+.doc-cats{flex:1;display:flex;flex-direction:column;gap:12px;margin-top:12px}
+.doc-cats[hidden],#docListWrap[hidden]{display:none}
+.doc-cat{flex:1;min-height:104px;display:flex;align-items:center;gap:16px;padding:18px 20px;border-radius:18px;border:1px solid var(--line);background:var(--field);font:inherit;color:var(--ink);cursor:pointer;text-align:start;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.doc-cat .ci{flex:0 0 auto;width:54px;height:54px;border-radius:14px;background:rgba(28,50,42,.10);color:var(--accent);display:flex;align-items:center;justify-content:center}
+.doc-cat b{display:block;font-family:var(--display);font-size:25px;line-height:1.1;color:var(--accent)}
+.doc-cat small{display:block;font-size:13.5px;color:var(--muted);font-weight:700;margin-top:3px}
+.doc-cat .cnt{margin-inline-start:auto;min-width:46px;height:46px;padding:0 8px;box-sizing:border-box;border-radius:23px;background:var(--accent);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:19px;font-variant-numeric:tabular-nums}
+.doc-empty{text-align:center;color:var(--muted);font-weight:700;padding:40px 10px}
+.doc-row{display:flex;align-items:center;gap:12px;width:100%;padding:12px 4px;border:0;border-bottom:1px solid var(--line);background:none;font:inherit;color:var(--ink);cursor:pointer;text-align:start}
+.doc-row img{width:46px;height:58px;object-fit:cover;border-radius:6px;border:1px solid var(--line);background:#fff;flex:0 0 auto}
+.doc-row .dm{min-width:0;flex:1}
+.doc-row .dp{font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.doc-row .dd{font-size:12.5px;color:var(--muted);font-weight:700;margin-top:2px}
+.doc-row .da{font-weight:800;white-space:nowrap;font-variant-numeric:tabular-nums}
+.doc-ov{position:fixed;inset:0;z-index:40;background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px;text-align:center}
+.doc-ov[hidden]{display:none}
+.doc-ov.res{justify-content:flex-start;overflow:auto;padding-top:max(32px,env(safe-area-inset-top,0px))}
+.doc-res{width:100%;max-width:480px;text-align:start}
+.doc-res .rr{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.doc-res .rr .dm{flex:1;min-width:0;font-weight:700;font-size:14px}
+.doc-res .rr .dm small{display:block;color:var(--muted);font-size:12.5px}
+.doc-sel{font:inherit;font-size:15px;font-weight:800;padding:7px 8px;border-radius:9px;border:1px solid var(--line);background:var(--field);color:var(--ink)}
+.doc-ov .np-close{width:100%;max-width:480px}
+.doc-dup{width:100%;max-width:560px;display:grid;grid-template-columns:1fr 1fr;gap:10px;text-align:start}
+.doc-dup figure{margin:0;min-width:0}
+.doc-dup figcaption{font-size:13px;font-weight:800;color:var(--accent);margin-bottom:5px}
+.doc-ov>*{flex-shrink:0}
+.doc-oth{display:block;width:100%;max-width:420px;height:min(40vh,320px);object-fit:contain;border-radius:8px;border:1px solid var(--line);background:#fff}
+.doc-dup img{display:block;width:100%;height:min(42vh,340px);object-fit:contain;object-position:top;border-radius:8px;border:1px solid var(--line);background:#fff}
+.doc-dup .dd{font-size:12.5px;font-weight:700;color:var(--muted);margin-top:5px;line-height:1.35}
+.doc-dupb{width:100%;max-width:560px;display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.doc-dupb button{font:inherit;font-weight:800;font-size:16px;border-radius:12px;padding:13px;cursor:pointer;border:1px solid var(--line);background:var(--field);color:var(--ink)}
+.doc-dupb button.pri{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.doc-vw{position:fixed;inset:0;z-index:40;background:var(--bg);overflow:auto;padding:max(12px,env(safe-area-inset-top,0px)) 16px max(20px,env(safe-area-inset-bottom,0px))}
+.doc-vw[hidden]{display:none}
+.doc-vw .vh{display:flex;justify-content:space-between;align-items:center;gap:8px;position:sticky;top:0;background:var(--bg);padding:6px 0 10px;z-index:1}
+.doc-vw img{display:block;width:100%;max-width:640px;margin:0 auto 10px;border-radius:8px;border:1px solid var(--line);background:#fff}
+.doc-kv{max-width:640px;margin:0 auto 12px}
+.doc-kv div{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-weight:700}
+.doc-kv span:first-child{color:var(--muted)}
+.doc-edit{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-weight:800;color:var(--ink);text-align:start}
+.doc-edit svg{color:var(--warn);flex:0 0 auto}
+.doc-edit.empty{color:var(--muted);font-weight:700}
+.doc-kv .kvv{min-width:0;text-align:end}
+.doc-in{display:flex;gap:6px;align-items:center}
+.doc-in input{font:inherit;font-size:16px;font-weight:700;width:150px;max-width:46vw;box-sizing:border-box;padding:6px 8px;border-radius:8px;border:1.5px solid var(--warn);background:var(--field);color:var(--ink)}
+.doc-ok{font:inherit;font-weight:800;font-size:14px;border:0;border-radius:8px;padding:7px 10px;background:var(--accent);color:var(--accent-ink);cursor:pointer}
+.doc-del{all:unset;cursor:pointer;color:var(--err);font-weight:800;font-size:15px;padding:6px 0}
 .np-scanbtn{display:flex;align-items:center;justify-content:center;gap:8px;font-weight:800;font-size:16px;border-radius:12px;padding:12px;background:var(--warn);color:#fff;cursor:pointer}
 .np-scan,.np-donescr{position:absolute;inset:0;z-index:2;border-radius:16px;background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px;text-align:center}
 .scan-doc{position:relative;width:110px;height:140px;border-radius:10px;background:#fff;border:2px solid var(--line);padding:16px 14px;display:flex;flex-direction:column;gap:9px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.12)}
@@ -274,6 +327,22 @@ li.unmarked .name::after{content:attr(data-miss);display:block;font-size:13px;fo
 .pin-ask{margin-top:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px}
 .pin-ask{align-items:center;text-align:center}
 .pin-ask label{font-weight:800;font-size:17px}
+.fid-btn{display:flex;align-items:center;justify-content:center;gap:7px;font:inherit;font-weight:800;font-size:15px;border:0;border-radius:10px;padding:10px 16px;background:var(--accent);color:var(--accent-ink);cursor:pointer;margin:8px auto 0}
+.fid-btn[hidden],.sec-b[hidden],.pin-form[hidden]{display:none}
+.sec{margin-top:28px;padding-top:16px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.sec-h{font-family:var(--display);font-size:19px;color:var(--accent);text-align:center}
+.sec-b{display:flex;align-items:center;justify-content:center;gap:8px;font:inherit;font-weight:800;font-size:15px;border:1px solid var(--line);border-radius:12px;padding:12px 16px;background:var(--field);color:var(--ink);cursor:pointer}
+.sec-b.warn{color:var(--err)}
+.pin-form{display:flex;flex-direction:column;gap:8px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--field)}
+.pin-form input{width:9em;font:inherit;font-size:22px;letter-spacing:.4em;text-align:center;padding:8px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)}
+.pin-form button{font:inherit;font-weight:800;font-size:15px;border:0;border-radius:10px;padding:10px 22px;background:var(--accent);color:var(--accent-ink);cursor:pointer}
+.pin-form input::placeholder{letter-spacing:0;font-size:16px}
+.lock-list{display:flex;flex-direction:column;gap:6px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--field)}
+.lock-h{font-weight:800;font-size:14px;color:var(--muted);text-align:center}
+.lock-row{display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:700;font-size:14px;padding:6px 0;border-top:1px solid var(--line)}
+.lock-row button{font:inherit;font-weight:800;font-size:14px;border:0;border-radius:9px;padding:8px 14px;background:var(--accent);color:var(--accent-ink);cursor:pointer;white-space:nowrap}
+.pin-locked input{opacity:.4}
+.sec-msg{text-align:center;font-size:13.5px;font-weight:800;color:var(--muted);min-height:1em}
 .pin-row{display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;width:100%}
 .pin-row input{box-sizing:border-box;max-width:100%}
 .pin-err:empty{display:none}
@@ -431,6 +500,9 @@ body.kp-open #supView header{padding-block:4px 6px}
       <button type="button" class="home-gear" id="repBtn" aria-label="הגדרות ודוחות">
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
       </button>
+      <button type="button" class="home-gear doc-ic" id="docBtn" aria-label="סריקת מסמכים" hidden>
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><path d="M3 12h18"/></svg>
+      </button>
       <div class="branch-sw" role="group" aria-label="בחירת סניף">
         <button type="button" data-b="rishon">ראשון לציון</button>
         <button type="button" data-b="jlm">ירושלים</button>
@@ -442,6 +514,7 @@ body.kp-open #supView header{padding-block:4px 6px}
           <button type="button" class="ca-no" id="brPinNo">ביטול</button>
         </div>
         <div class="pin-err" id="brPinErr" role="alert"></div>
+        <button type="button" class="fid-btn" data-fid="br" hidden><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01M15 9h.01"/></svg>זיהוי פנים</button>
       </div>
     </div>
     <div class="tiles" id="tiles"></div>
@@ -477,6 +550,7 @@ body.kp-open #supView header{padding-block:4px 6px}
         <button type="button" class="ca-no" id="pinNo">ביטול</button>
       </div>
       <div class="pin-err" id="pinErr" role="alert"></div>
+      <button type="button" class="fid-btn" data-fid="pin" hidden><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01M15 9h.01"/></svg>זיהוי פנים</button>
     </div>
     <div class="clear-ask" id="clearAsk" hidden role="alert">
       <span id="clearQ">בטוח שרוצה לנקות את ההזמנה?</span>
@@ -535,8 +609,41 @@ body.kp-open #supView header{padding-block:4px 6px}
       <button type="button" class="rep-btn ghost" id="repCsv">ייצוא לאקסל</button>
     </div>
     <div class="rep-status" id="repStatus" role="status"></div>
+    <div class="sec">
+      <div class="sec-h">אבטחה</div>
+      <button type="button" class="sec-b" id="fidSet" hidden></button>
+      <button type="button" class="sec-b warn" id="fidAll"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/></svg><span>בטל זיהוי פנים בכל הטלפונים</span></button>
+      <button type="button" class="sec-b" id="pinChg"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>החלף קוד</button>
+      <div class="pin-form" id="pinForm" hidden>
+        <input id="pinNew1" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="קוד חדש" aria-label="קוד חדש">
+        <input id="pinNew2" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="שוב" aria-label="הקלד שוב את הקוד החדש">
+        <button type="button" id="pinSave">שמור קוד חדש</button>
+      </div>
+      <div class="lock-list" id="lockList"></div>
+      <div class="sec-msg" id="secMsg" role="status"></div>
+    </div>
     <div class="app-ver" id="appVer"></div>
   </section>
+
+  <section id="docView" class="wrap" hidden>
+    <header>
+      <button class="back" id="docBack" type="button">→ חזרה</button>
+      <h1 class="sname" id="docTitle">מסמכים</h1>
+    </header>
+    <label class="np-scanbtn doc-scan" id="docScanBtn">
+      <input type="file" id="docFile" accept="image/*,application/pdf" multiple hidden>
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><path d="M3 12h18"/></svg>
+      סרוק מסמך
+    </label>
+    <div class="doc-cats" id="docCats">
+      <button type="button" class="doc-cat" data-t="invoice"><span class="ci"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8M12 17.5v-11"/></svg></span><span><b>חשבוניות</b><small>מספקים</small></span><span class="cnt">0</span></button>
+      <button type="button" class="doc-cat" data-t="delivery"><span class="ci"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2M15 18H9M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.62l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg></span><span><b>תעודות משלוח</b><small>מספקים</small></span><span class="cnt">0</span></button>
+      <button type="button" class="doc-cat" data-t="income"><span class="ci"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 7h6v6"/><path d="m22 7-8.5 8.5-5-5L2 17"/></svg></span><span><b>הכנסות</b><small>מאת הלחמניא</small></span><span class="cnt">0</span></button>
+    </div>
+    <div id="docListWrap" hidden><div id="docList"></div></div>
+  </section>
+  <div class="doc-ov" id="docOv" hidden></div>
+  <div class="doc-vw" id="docVw" hidden></div>
 
   <div class="dlg-back" id="npDlg" hidden>
     <div class="dlg np-dlg" role="dialog" aria-modal="true" aria-labelledby="npQ">
@@ -574,6 +681,7 @@ body.kp-open #supView header{padding-block:4px 6px}
       <div class="dlg-name" id="dlgName"></div>
       <input class="dlg-pin" id="dlgPin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" hidden>
       <div class="pin-err" id="dlgErr" role="alert"></div>
+      <button type="button" class="fid-btn" data-fid="dlg" hidden><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01M15 9h.01"/></svg>זיהוי פנים</button>
       <div class="dlg-btns">
         <button type="button" class="dlg-yes" id="dlgYes"></button>
         <button type="button" class="dlg-no" id="dlgNo"></button>
@@ -857,7 +965,9 @@ const save = (k,v)=>{ const s=JSON.stringify(v); MEM[k]=s; try{localStorage.setI
 // shared between all phones: order history, targets, prices, names, added / hidden / removed products
 var SYNC_DB="https://halechmania-orders-default-rtdb.europe-west1.firebasedatabase.app/shops/halechmania-rishon";
 var OP_RE_S=/^hl_(targets|prices|names|extra|hidden|removed)_/;
-var syncRe=/^hl_(hist|histreset|targets|prices|names|extra|hidden|removed)_/;
+var syncRe=/^hl_(hist|histreset|targets|prices|names|extra|hidden|removed|lock)_|^hl_sec$/;
+// a code change made in the Claude link (newest one wins)
+var SEED_SEC=null;
 function syncGet(k,f){try{const v=localStorage.getItem(k);return v?JSON.parse(v):f}catch(e){return f}}
 function syncPut(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 function syncMark(k){
@@ -946,6 +1056,7 @@ async function syncPull(){
       if(kind==="prices" && o.op==="set" && v!=null){ const sp=SUPPLIERS.find(s=>!s.base && "hl_prices_"+dataKey(s)===o.k); if(sp) fillHistPrice(sp,o.f,v); } }
     seedMark[id]=true; changed=true;
   });
+  if(SEED_SEC && SEED_SEC.t){ const c=syncGet("hl_sec",null); if(!c || !(c.t>=SEED_SEC.t)){ save("hl_sec",SEED_SEC); changed=true; } }
   if(Object.keys(seedMark).length) fetch(SYNC_DB+"/seeds.json",{method:"PATCH",body:JSON.stringify(seedMark)}).catch(()=>{});
   if(Object.keys(syncGet("hl_sync_pending",{})).length) syncSoon();
   if(changed) syncRefresh();
@@ -963,7 +1074,46 @@ setInterval(()=>{ if(!document.hidden) syncPull(); },20000);
 document.addEventListener("visibilitychange",()=>{ if(!document.hidden) syncPull(); });
 window.addEventListener("online",()=>{ syncFlush(); syncPull(); });
 // changes made in the Claude link that the next site file (index.html) carries to every phone (filled when the site is built)
-const SEED_OPS=[{"k": "hl_prices_cocacola", "f": "c11", "op": "set", "v": "69.69", "t": 1794165250078}, {"k": "hl_prices_orpaami", "f": "o3", "op": "set", "v": "85", "t": 1794167033643}, {"k": "hl_prices_orpaami", "f": "o5", "op": "set", "v": "11.5", "t": 1794167033644}, {"k": "hl_prices_orpaami", "f": "o22", "op": "set", "v": "7.9", "t": 1794167033645}, {"k": "hl_prices_orpaami", "f": "o21", "op": "set", "v": "22", "t": 1794167033645}, {"k": "hl_prices_orpaami", "f": "o26", "op": "set", "v": "83", "t": 1794167033646}, {"k": "hl_prices_orpaami", "f": "o24", "op": "set", "v": "85", "t": 1794167033646}, {"k": "hl_prices_orpaami", "f": "o23", "op": "set", "v": "26", "t": 1794167033646}, {"k": "hl_prices_orpaami", "f": "o25", "op": "set", "v": "11", "t": 1794167033646}, {"k": "hl_prices_orpaami", "f": "o27", "op": "set", "v": "14", "t": 1794167033647}];
+const SEED_OPS=[{"k": "hl_prices_cocacola", "f": "c11", "op": "set", "v": "69.69", "t": 1794165250078}, {"k": "hl_prices_orpaami", "f": "o3", "op": "set", "v": "85", "t": 1794167033643}, {"k": "hl_prices_orpaami", "f": "o5", "op": "set", "v": "11.5", "t": 1794167033644}, {"k": "hl_prices_orpaami", "f": "o22", "op": "set", "v": "7.9", "t": 1794167033645}, {"k": "hl_prices_orpaami", "f": "o21", "op": "set", "v": "22", "t": 1794167033645}, {"k": "hl_prices_orpaami", "f": "o26", "op": "set", "v": "83", "t": 1794167033646}, {"k": "hl_prices_orpaami", "f": "o24", "op": "set", "v": "85", "t": 1794167033646}, {"k": "hl_prices_orpaami", "f": "o23", "op": "set", "v": "26", "t": 1794167033646}, {"k": "hl_prices_orpaami", "f": "o25", "op": "set", "v": "11", "t": 1794167033646}, {"k": "hl_prices_orpaami", "f": "o27", "op": "set", "v": "14", "t": 1794167033647}, {"k": "hl_prices_orpaami", "f": "o6", "op": "set", "v": "135.07", "t": 1794247721280}, {"k": "hl_prices_orpaami", "f": "o10", "op": "set", "v": "14.01", "t": 1794247721281}, {"k": "hl_prices_orpaami", "f": "o12", "op": "set", "v": "135.07", "t": 1794247721281}, {"k": "hl_prices_orpaami", "f": "o17", "op": "set", "v": "4.5", "t": 1794247721282}, {"k": "hl_prices_orpaami", "f": "o20", "op": "set", "v": "6.2", "t": 1794247721282}, {"k": "hl_prices_orpaami", "f": "o34", "op": "set", "v": "43.02", "t": 1794247721282}];
+// ===== documents on the site: read-only copy of what was scanned in the Claude link (baked in at build time) =====
+var SITE_DOCS=[{"type": "delivery", "party": "פרי השדה", "no": "267786", "date": "2025-05-29", "sub": 524.31, "total": 538.35, "branch": "rishon", "ts": 1794343081806}, {"type": "delivery", "party": "באלו שיווק והפצה", "no": "162396", "date": "2025-05-04", "sub": 600, "total": 600, "branch": "rishon", "ts": 1794343085536}, {"type": "invoice", "party": "אור פעמי", "no": "IN264015503", "date": "2026-11-10", "sub": 2036.44, "total": 2403, "branch": "rishon", "ts": 1794343089382}, {"type": "invoice", "party": "אור פעמי", "no": "IN264015503", "date": "2026-11-10", "sub": 2036.44, "total": 2403, "branch": "rishon", "ts": 1794343094020}, {"type": "invoice", "party": "מאפיית לחם בוכרי אמנון", "no": "8186970", "date": "2026-11-09", "sub": 121.19, "total": 143, "branch": "rishon", "ts": 1794343099316}, {"type": "income", "party": "פלאקסי ישראל בע\"מ", "no": "1038", "date": "2026-10-30", "sub": 28459, "total": 28459, "branch": "rishon", "ts": 1794343106482}, {"type": "invoice", "party": "אור פעמי", "no": "IN264012746", "date": "2026-09-23", "sub": 79.66, "total": 94, "branch": "rishon", "ts": 1794343110584}, {"type": "invoice", "party": "כל בו חצי חינם בע\"מ", "no": "0132818", "date": "2026-11-01", "sub": 45.59, "total": 53.8, "branch": "rishon", "ts": 1794344036789}, {"type": "invoice", "party": "אבי כלים חד פעמיים", "no": "8254685", "date": "2026-11-01", "sub": 66.1, "total": 78, "branch": "rishon", "ts": 1794344040303}, {"type": "invoice", "party": "ארכה בע\"מ", "no": "45332617576", "date": "2026-10-25", "sub": 91.52, "total": 108, "branch": "rishon", "ts": 1794344043906}, {"type": "income", "party": "BIT", "no": "1034", "date": "2026-07-31", "sub": null, "total": 718, "branch": "rishon", "ts": 1794344049332}, {"type": "invoice", "party": "ש.זעפרני שיווק מזון בע\"מ", "no": "IN264013102", "date": "2026-10-11", "sub": 61.86, "total": 73, "branch": "rishon", "ts": 1794344052992}, {"type": "invoice", "party": "כל בו חצי חינם בע\"מ", "no": "0070693", "date": "2026-10-06", "sub": 49.41, "total": 58.3, "branch": "rishon", "ts": 1794344057039}, {"type": "invoice", "party": "החברה המרכזית להפצת משקאות בע\"מ", "no": "112935625", "date": "2026-09-29", "sub": 2500.02, "total": 2950.02, "branch": "rishon", "ts": 1794344062042}, {"type": "invoice", "party": "מושיקו רזל מעדני עופר בע\"מ", "no": "01/048030", "date": "2026-09-27", "sub": 720.34, "total": 850, "branch": "rishon", "ts": 1794344066457}, {"type": "invoice", "party": "בטחון המנעול ייל אקספר", "no": "10010023231", "date": "2026-10-19", "sub": 76.27, "total": 90, "branch": "rishon", "ts": 1794344673406}, {"type": "invoice", "party": "אבי כלים חד פעמיים", "no": "8252855", "date": "2026-10-18", "sub": 30.51, "total": 36, "branch": "rishon", "ts": 1794344677192}, {"type": "invoice", "party": "תוצרת חקלאית בע\"מ", "no": "0080390", "date": "2026-10-16", "sub": 11.78, "total": 11.8, "branch": "rishon", "ts": 1794344682723}, {"type": "invoice", "party": "BOOOM", "no": "1074060301", "date": "2026-10-20", "sub": 40.42, "total": 47.7, "branch": "rishon", "ts": 1794344688560}, {"type": "invoice", "party": "כל בו חצי חינם בע\"מ", "no": "0044169", "date": "2026-10-20", "sub": 38.2, "total": 38.22, "branch": "rishon", "ts": 1794344693579}];
+(function(){
+  const T={invoice:"חשבונית",delivery:"תעודת משלוח",income:"הכנסה"}, G={invoice:"חשבוניות",delivery:"תעודות משלוח",income:"הכנסות"};
+  const $=id=>document.getElementById(id); let grp=null;
+  const fd=d=>{ const m=/^(\d{4})-(\d{2})-(\d{2})/.exec(d||""); return m?(+m[3])+"."+(+m[2])+"."+m[1]:""; };
+  const key=x=>(x.date||"")+String(x.ts||0).padStart(15,"0");
+  const mine=()=>SITE_DOCS.filter(x=>T[x.type] && (x.branch||"rishon")===branchId).sort((a,b)=>key(b)<key(a)?-1:1);
+  $("docBtn").hidden=false; $("docScanBtn").hidden=true;
+  function counts(){ const all=mine(); document.querySelectorAll("#docCats .doc-cat").forEach(b=>{ b.querySelector(".cnt").textContent=all.filter(x=>x.type===b.dataset.t).length; }); }
+  function cats(){ grp=null; $("docTitle").textContent="מסמכים · סניף "+branch().name; $("docCats").hidden=false; $("docListWrap").hidden=true; $("docScanBtn").hidden=true; counts(); }
+  function group(t){
+    grp=t; $("docTitle").textContent=G[t]+" · סניף "+branch().name; $("docCats").hidden=true; $("docListWrap").hidden=false;
+    const L=$("docList"); L.innerHTML=""; const items=mine().filter(x=>x.type===t);
+    if(!items.length){ const e=document.createElement("div"); e.className="doc-empty"; e.textContent="אין עדיין "+G[t]+"."; L.appendChild(e); }
+    items.forEach(x=>{ const b=document.createElement("button"); b.type="button"; b.className="doc-row";
+      const m=document.createElement("span"); m.className="dm";
+      const p=document.createElement("div"); p.className="dp"; p.textContent=x.party||"ללא שם";
+      const d=document.createElement("div"); d.className="dd"; d.textContent=[fd(x.date), x.no?"מס׳ "+x.no:""].filter(Boolean).join(" · ");
+      m.append(p,d); const a=document.createElement("span"); a.className="da"; a.textContent=x.total!=null?money(x.total):"";
+      b.append(m,a); b.addEventListener("click",()=>view(x)); L.appendChild(b); });
+  }
+  function view(x){
+    const V=$("docVw"); V.innerHTML=""; V.hidden=false;
+    const h=document.createElement("div"); h.className="vh"; const c=document.createElement("button"); c.type="button"; c.className="back"; c.textContent="→ חזרה";
+    c.addEventListener("click",()=>{ V.hidden=true; }); const k=document.createElement("b"); k.textContent=T[x.type]; h.append(c,k); V.appendChild(h);
+    const kv=document.createElement("div"); kv.className="doc-kv";
+    [[x.type==="income"?"לקוח":"ספק",x.party],["תאריך",fd(x.date)],["מספר מסמך",x.no],["לפני מע״מ",x.sub!=null?money(x.sub):""],["כולל מע״מ",x.total!=null?money(x.total):""]].forEach(([a,v])=>{ if(!v) return;
+      const r=document.createElement("div"); const s1=document.createElement("span"); s1.textContent=a; const s2=document.createElement("span"); s2.textContent=v; r.append(s1,s2); kv.appendChild(r); });
+    V.appendChild(kv);
+    const n=document.createElement("div"); n.className="doc-empty"; n.style.padding="16px 10px"; n.textContent="צילום המסמך נמצא בקישור בקלוד"; V.appendChild(n);
+  }
+  window.docOpen=function(){
+    closeKeypad(); homeView.hidden=true; supView.hidden=true; bar.hidden=true; $("histView").hidden=true; $("repView").hidden=true;
+    $("homeBg").hidden=true; document.body.classList.remove("on-home"); $("docView").hidden=false; cats(); window.scrollTo(0,0);
+  };
+  document.querySelectorAll("#docCats .doc-cat").forEach(b=>b.addEventListener("click",()=>{ group(b.dataset.t); window.scrollTo(0,0); }));
+  $("docBack").addEventListener("click",()=>{ if(grp){ cats(); window.scrollTo(0,0); } else showHome(); });
+})();
 
 // one-time clean start: removes order history and today's counts once per phone (targets, prices and products stay)
 (function(){
@@ -1033,6 +1183,101 @@ function setBranch(id){
   showHome();
 }
 // switching branch needs its own code, so nobody switches by mistake
+// ---------- security: the main code can be changed in ⚙ (shared by all phones);
+// Face ID is turned on per phone and is cancelled everywhere when the code changes
+const FID_KEY="hl_faceid"; let fidAvail=false;
+function secRec(){ const r=load("hl_sec",null); return r && typeof r==="object" ? r : null; }
+function secHash(salt,code){ let h=2166136261>>>0; const s=salt+"|"+code; for(let n=0;n<2000;n++){ for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619)>>>0; } h^=n; } return h.toString(16); }
+function pinIs(code){ const r=secRec(); return r && r.h ? secHash(r.s,code)===r.h : code===EDIT_PIN; }
+const secEpoch=()=>{ const r=secRec(); return r && r.e ? r.e : "0"; };
+function fidEnr(){ try{ const x=JSON.parse(localStorage.getItem(FID_KEY)||"null"); if(x && x.id && x.e===secEpoch()) return x; if(x) localStorage.removeItem(FID_KEY); }catch(e){} return null; }
+const fidOn=()=>fidAvail && !!fidEnr();
+const fidB64=buf=>btoa(String.fromCharCode(...new Uint8Array(buf)));
+const fidBin=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+const FID_IC='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01M15 9h.01"/></svg>';
+function fidUI(){
+  document.querySelectorAll('.fid-btn:not([data-fid="dlg"])').forEach(b=>b.hidden=!fidOn());
+  const t=document.getElementById("fidSet"); if(!t) return;
+  t.hidden=!fidAvail; t.innerHTML=FID_IC; t.append(fidEnr() ? "בטל זיהוי פנים בטלפון הזה" : "הפעל זיהוי פנים בטלפון הזה");
+}
+(async()=>{ try{ fidAvail=!!(window.PublicKeyCredential && PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable && await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()); }catch(e){} fidUI(); })();
+setInterval(()=>{ if(!document.hidden) fidUI(); },5000); // a code change from another phone switches the button off here too
+// call straight from a tap; true only when the face (or fingerprint) was really checked
+function fidCheck(){
+  const x=fidEnr(); if(!x || !fidAvail) return Promise.resolve(false);
+  try{
+    return navigator.credentials.get({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)), allowCredentials:[{type:"public-key",id:fidBin(x.id)}], userVerification:"required", timeout:60000}})
+      .then(a=>!!(a && a.response && (new Uint8Array(a.response.authenticatorData)[32]&4))).catch(()=>false);
+  }catch(e){ return Promise.resolve(false); }
+}
+const secMsg=t=>{ document.getElementById("secMsg").textContent=t; };
+document.getElementById("fidSet").addEventListener("click",async()=>{
+  secMsg("");
+  if(fidEnr()){ try{ localStorage.removeItem(FID_KEY); }catch(e){} fidUI(); secMsg("זיהוי הפנים בוטל בטלפון הזה – מעכשיו רק קוד"); return; }
+  try{
+    const c=await navigator.credentials.create({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)), rp:{name:"הלחמניא"},
+      user:{id:crypto.getRandomValues(new Uint8Array(16)), name:"halechmania", displayName:"הלחמניא · הזמנות"},
+      pubKeyCredParams:[{type:"public-key",alg:-7},{type:"public-key",alg:-257}],
+      authenticatorSelection:{authenticatorAttachment:"platform", userVerification:"required", residentKey:"preferred"}, timeout:60000}});
+    localStorage.setItem(FID_KEY,JSON.stringify({id:fidB64(c.rawId),e:secEpoch()})); fidUI(); secMsg("זיהוי הפנים הופעל בטלפון הזה ✓");
+  }catch(e){ secMsg(window.self!==window.top ? "זיהוי פנים עובד רק באפליקציה מהאתר, לא בקישור של Claude" : "לא הצלחתי להפעיל זיהוי פנים. נסה שוב."); }
+});
+function secWrite(code){
+  const r=secRec()||{}, now=Date.now(), e=now.toString(36)+Math.random().toString(36).slice(2,6);
+  const n= code ? {s:Math.random().toString(36).slice(2,10)} : {s:r.s, h:r.h};
+  if(code) n.h=secHash(n.s,code);
+  if(!n.h) delete n.h, delete n.s;
+  n.e=e; n.t=now; save("hl_sec",n);
+  try{ localStorage.removeItem(FID_KEY); }catch(err){} fidUI();
+}
+const fidAll=document.getElementById("fidAll");
+fidAll.addEventListener("click",()=>{
+  if(fidAll.dataset.sure!=="1"){ fidAll.dataset.sure="1"; fidAll.lastChild.textContent="לחץ שוב לאישור – יבוטל בכל הטלפונים"; return; }
+  fidAll.dataset.sure=""; fidAll.lastChild.textContent="בטל זיהוי פנים בכל הטלפונים";
+  secWrite(null); secMsg("זיהוי הפנים בוטל בכל הטלפונים ✓ כל טלפון יצטרך להפעיל מחדש עם הקוד");
+});
+document.getElementById("pinChg").addEventListener("click",()=>{ const f=document.getElementById("pinForm"); f.hidden=!f.hidden; secMsg(""); if(!f.hidden){ document.getElementById("pinNew1").value=""; document.getElementById("pinNew2").value=""; document.getElementById("pinNew1").focus(); } });
+["pinNew1","pinNew2"].forEach(id=>document.getElementById(id).addEventListener("input",e=>{ e.target.value=e.target.value.replace(/\D/g,"").slice(0,4); }));
+document.getElementById("pinSave").addEventListener("click",()=>{
+  const a=document.getElementById("pinNew1").value, b=document.getElementById("pinNew2").value;
+  if(a.length!==4){ secMsg("הקוד חייב להיות 4 ספרות"); return; }
+  if(a!==b){ secMsg("שני הקודים לא זהים – נסה שוב"); document.getElementById("pinNew2").value=""; return; }
+  if(a===BRANCH_PIN){ secMsg("בחר קוד שונה מקוד החלפת הסניף"); return; }
+  secWrite(a); document.getElementById("pinForm").hidden=true;
+  secMsg("הקוד הוחלף ✓ זיהוי הפנים בוטל בכל הטלפונים");
+});
+// ---------- lock: 3 wrong codes in a row block this phone until it is released in ⚙ (from any phone)
+const LOCK_MAX=3, lockUse = window.self===window.top; // not in the Claude link
+function devId(){ let d=null; try{ d=localStorage.getItem("hl_dev"); if(!d){ d=Date.now().toString(36)+Math.random().toString(36).slice(2,8); localStorage.setItem("hl_dev",d); } }catch(e){ d="x"; } return d; }
+const lockKey=()=>"hl_lock_"+devId();
+const lockOn=()=>{ if(!lockUse) return false; const r=load(lockKey(),null); return !!(r && r.on); };
+function devDesc(){ const u=navigator.userAgent||""; return /iPhone/.test(u)?"iPhone":/iPad/.test(u)?"iPad":/Android/.test(u)?"Android":/Mac/.test(u)?"Mac":/Windows/.test(u)?"Windows":"מכשיר"; }
+const LOCK_TXT="הטלפון נחסם אחרי 3 קודים שגויים. רק המנהל יכול לשחרר אותו בהגדרות.";
+function lockFail(){ // true when this wrong code locked the phone
+  if(!lockUse) return false;
+  let n=0; try{ n=(+localStorage.getItem("hl_pinfail")||0)+1; localStorage.setItem("hl_pinfail",n); }catch(e){}
+  if(n<LOCK_MAX) return false;
+  try{ localStorage.setItem("hl_pinfail",0); }catch(e){}
+  save(lockKey(),{on:true,t:Date.now(),ua:devDesc()}); return true;
+}
+function lockOk(){ try{ localStorage.setItem("hl_pinfail",0); }catch(e){} if(lockOn()) save(lockKey(),{on:false,t:Date.now(),ua:devDesc()}); }
+const lockLeft=()=>{ let n=0; try{ n=+localStorage.getItem("hl_pinfail")||0; }catch(e){} return LOCK_MAX-n; };
+function lockUI(){
+  const L=document.getElementById("lockList"); if(!L) return;
+  let keys=[]; try{ keys=Object.keys(localStorage).filter(k=>/^hl_lock_/.test(k)); }catch(e){}
+  const rows=keys.map(k=>({k,r:load(k,null)})).filter(x=>x.r && x.r.on).sort((a,b)=>b.r.t-a.r.t);
+  L.innerHTML="";
+  const h=document.createElement("div"); h.className="lock-h"; h.textContent=rows.length?"טלפונים חסומים ("+rows.length+")":"אין טלפונים חסומים"; L.appendChild(h);
+  rows.forEach(({k,r})=>{
+    const d=document.createElement("div"); d.className="lock-row";
+    const t=document.createElement("span"); const dt=new Date(r.t);
+    t.textContent=(r.ua||"מכשיר")+(k===lockKey()?" (הטלפון הזה)":"")+" · נחסם "+dt.toLocaleDateString("he-IL",{day:"numeric",month:"numeric"})+" "+dt.toLocaleTimeString("he-IL",{hour:"2-digit",minute:"2-digit"});
+    const b=document.createElement("button"); b.type="button"; b.textContent="שחרר";
+    b.addEventListener("click",()=>{ save(k,{on:false,t:Date.now(),ua:r.ua}); secMsg("הטלפון שוחרר ✓ הוא יוכל להקליד קוד שוב"); lockUI(); });
+    d.append(t,b); L.appendChild(d);
+  });
+}
+setInterval(()=>{ if(!document.hidden && !document.getElementById("repView").hidden) lockUI(); },5000);
 const BRANCH_PIN="1111";
 const brPin=document.getElementById("brPin"), brPinIn=document.getElementById("brPinIn");
 let brWant=null;
@@ -1040,8 +1285,11 @@ document.querySelectorAll(".branch-sw button").forEach(b=>b.addEventListener("cl
   if(b.dataset.b===branchId){ brPin.hidden=true; return; }
   brWant=b.dataset.b;
   document.getElementById("brPinQ").textContent="הקלד קוד למעבר לסניף "+BRANCHES[brWant].name;
-  document.getElementById("brPinErr").textContent=""; brPinIn.value=""; brPin.hidden=false; brPinIn.focus();
+  document.getElementById("brPinErr").textContent=""; brPinIn.value=""; brPin.hidden=false;
+  if(fidOn()) brFid(); else brPinIn.focus();
 }));
+function brFid(){ fidCheck().then(ok=>{ if(ok && !brPin.hidden && brWant){ brPin.hidden=true; brPinIn.blur(); const w=brWant; brWant=null; setBranch(w); } else if(!brPin.hidden) brPinIn.focus(); }); }
+document.querySelector('.fid-btn[data-fid="br"]').addEventListener("click",brFid);
 document.getElementById("brPinNo").addEventListener("click",()=>{ brPin.hidden=true; brPinIn.blur(); brWant=null; });
 brPinIn.addEventListener("input",()=>{
   brPinIn.value=brPinIn.value.replace(/\D/g,"").slice(0,4);
@@ -1057,7 +1305,7 @@ function showHome(){
   // leaving a supplier starts its next order clean
   if(cur) save("hl_day_"+dataKey(cur),{date:todayKey(),vals:{},note:""});
   cur=null; editing=false; pinOk=false; closeKeypad(); L="he"; applyLang();
-  supView.hidden=true; bar.hidden=true; homeView.hidden=false; document.getElementById("homeBg").hidden=false; document.body.classList.add("on-home"); document.getElementById("histView").hidden=true; document.getElementById("repView").hidden=true;
+  supView.hidden=true; bar.hidden=true; homeView.hidden=false; document.getElementById("homeBg").hidden=false; document.body.classList.add("on-home"); document.getElementById("histView").hidden=true; document.getElementById("repView").hidden=true; document.getElementById("docView").hidden=true;
   const tiles=document.getElementById("tiles"); tiles.innerHTML="";
   // home order, read in pairs: right column, left column (per branch)
   document.querySelectorAll(".branch-sw button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.b===branchId?"true":"false"));
@@ -1364,6 +1612,7 @@ function showReports(){
   homeView.hidden=true; supView.hidden=true; bar.hidden=true; document.getElementById("histView").hidden=true;
   document.getElementById("homeBg").hidden=true; document.body.classList.remove("on-home");
   document.getElementById("repView").hidden=false;
+  secMsg(""); document.getElementById("pinForm").hidden=true; fidUI(); lockUI();
   document.getElementById("repTitle").textContent="דוחות · סניף "+branch().name;
   const sSel=document.getElementById("repSup"); sSel.innerHTML=""; sSel.add(new Option("כל הספקים","all"));
   repSups().forEach(s=>sSel.add(new Option(supTitle(s),s.id)));
@@ -1372,7 +1621,7 @@ function showReports(){
 }
 document.getElementById("repBtn").addEventListener("click",showReports);
 // set when the site file (index.html) is built
-const APP_BUILD="9.11.2026 · 20:58";
+const APP_BUILD="11.11.2026 · 07:21";
 document.getElementById("appVer").textContent = APP_BUILD.startsWith("__") ? "גרסת תצוגה (קישור Claude)" : "עדכון אחרון של האפליקציה: "+APP_BUILD;
 function repPerUI(){ document.querySelectorAll("#repPer button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.p===repPeriod?"true":"false"));
   const box=document.getElementById("repRange"); box.hidden=repPeriod!=="custom";
@@ -1700,23 +1949,31 @@ let pinOk=false, pinFor="editBtn";
 const pinAsk=document.getElementById("pinAsk"), pinIn=document.getElementById("pinIn");
 // editing and history are both locked with the code
 document.body.appendChild(document.getElementById("pinAsk")); // the code box works from every screen
-["editBtn","histBtn","repBtn"].forEach(id=>document.getElementById(id).addEventListener("click",e=>{
+["editBtn","histBtn","repBtn","docBtn"].forEach(id=>document.getElementById(id).addEventListener("click",e=>{
   if(pinOk || (id==="editBtn" && editing)) return;
   e.stopImmediatePropagation();
   closeKeypad(); pinFor=id;
   document.getElementById("pinQ").textContent=tr().pinQ;
   document.getElementById("pinNo").textContent=tr().pinNo;
   document.getElementById("pinErr").textContent="";
-  pinIn.value=""; pinAsk.hidden=false; pinIn.focus();
+  pinIn.value=""; pinAsk.hidden=false;
+  const lk=lockOn(); pinIn.disabled=lk; pinAsk.classList.toggle("pin-locked",lk); if(lk) document.getElementById("pinErr").textContent=LOCK_TXT;
+  if(fidOn()) pinFid(); else if(!lk) pinIn.focus();
 },true));
+function pinFid(){ fidCheck().then(ok=>{ if(ok && !pinAsk.hidden){ lockOk(); pinIn.disabled=false; pinAsk.classList.remove("pin-locked"); pinOk=true; pinAsk.hidden=true; pinIn.blur(); document.getElementById(pinFor).click(); } else if(!pinAsk.hidden && !pinIn.disabled) pinIn.focus(); }); }
+document.querySelector('.fid-btn[data-fid="pin"]').addEventListener("click",pinFid);
+document.getElementById("docBtn").addEventListener("click",()=>{ if(window.docOpen) window.docOpen(); });
 pinIn.addEventListener("input",()=>{
   pinIn.value=pinIn.value.replace(/\D/g,"").slice(0,4);
   if(pinIn.value.length<4) return;
-  if(pinIn.value===EDIT_PIN){
-    pinOk=true; pinAsk.hidden=true; pinIn.blur();
+  if(lockOn()){ pinIn.value=""; pinIn.disabled=true; return; }
+  if(pinIs(pinIn.value)){
+    lockOk(); pinOk=true; pinAsk.hidden=true; pinIn.blur();
     document.getElementById(pinFor).click();
   } else {
-    document.getElementById("pinErr").textContent=tr().pinWrong;
+    const lk=lockFail(), left=lockLeft();
+    document.getElementById("pinErr").textContent = lk ? LOCK_TXT : (lockUse && left<LOCK_MAX ? tr().pinWrong+(left===1?" · נשאר ניסיון אחד":" · נשארו "+left+" ניסיונות") : tr().pinWrong);
+    if(lk){ pinIn.disabled=true; pinIn.blur(); pinAsk.classList.add("pin-locked"); }
     pinIn.value="";
     pinAsk.classList.remove("shake"); void pinAsk.offsetWidth; pinAsk.classList.add("shake");
     try{ navigator.vibrate && navigator.vibrate(120); }catch(_){}
@@ -1942,18 +2199,20 @@ function askDlg(kind,p,action){
   dlgAction=action; document.getElementById("dlg").hidden=false;
   document.getElementById("dlgNo").focus();
 }
-function closeDlg(){ document.getElementById("dlg").hidden=true; dlgAction=null; dlgPin.hidden=true; dlgPin.value=""; document.getElementById("dlgErr").textContent=""; }
+function closeDlg(){ dlgPin.disabled=false; document.querySelector('.fid-btn[data-fid="dlg"]').hidden=true; document.getElementById("dlg").hidden=true; dlgAction=null; dlgPin.hidden=true; dlgPin.value=""; document.getElementById("dlgErr").textContent=""; }
 // ---------- delete one order from the history: swipe it, tap "מחק", enter the code
 const dlgPin=document.getElementById("dlgPin");
 dlgPin.addEventListener("input",()=>{ dlgPin.value=dlgPin.value.replace(/\D/g,"").slice(0,4); document.getElementById("dlgErr").textContent=""; });
 document.getElementById("dlgYes").addEventListener("click",e=>{
   if(dlgPin.hidden) return;
-  if(dlgPin.value!==EDIT_PIN){
+  if(dlgPin.dataset.face!=="1" && (lockOn() || !pinIs(dlgPin.value))){
     e.stopImmediatePropagation();
-    document.getElementById("dlgErr").textContent=tr().pinWrong; dlgPin.value="";
+    const lk=lockOn() || lockFail(), left=lockLeft();
+    document.getElementById("dlgErr").textContent = lk ? LOCK_TXT : (lockUse && left<LOCK_MAX ? tr().pinWrong+(left===1?" · נשאר ניסיון אחד":" · נשארו "+left+" ניסיונות") : tr().pinWrong); dlgPin.value="";
+    if(lk){ dlgPin.disabled=true; return; }
     const bx=document.querySelector("#dlg .dlg"); bx.classList.remove("shake"); void bx.offsetWidth; bx.classList.add("shake");
     dlgPin.focus();
-  }
+  } else lockOk();
 },true);
 function askDelOrder(o){
   const x=tr(), box=document.querySelector("#dlg .dlg"); box.className="dlg del";
@@ -1965,8 +2224,13 @@ function askDelOrder(o){
   document.getElementById("dlg").setAttribute("dir",x.dir);
   dlgPin.placeholder=x.pinPh; dlgPin.value=""; dlgPin.hidden=false; document.getElementById("dlgErr").textContent="";
   dlgAction=()=>deleteOrder(o);
-  document.getElementById("dlg").hidden=false; dlgPin.focus();
+  document.getElementById("dlg").hidden=false;
+  document.querySelector('.fid-btn[data-fid="dlg"]').hidden=!fidOn();
+  const lk=lockOn(); dlgPin.disabled=lk; if(lk) document.getElementById("dlgErr").textContent=LOCK_TXT;
+  if(fidOn()) dlgFid(); else if(!lk) dlgPin.focus();
 }
+function dlgFid(){ fidCheck().then(ok=>{ if(ok && dlgAction && !dlgPin.hidden){ lockOk(); dlgPin.disabled=false; dlgPin.dataset.face="1"; document.getElementById("dlgYes").click(); dlgPin.dataset.face=""; } else if(!dlgPin.hidden) dlgPin.focus(); }); }
+document.querySelector('.fid-btn[data-fid="dlg"]').addEventListener("click",dlgFid);
 function deleteOrder(o){
   const k=dataKey(cur), t=load("hl_histdel_"+k,[]);
   if(!t.includes(o.ts)){ t.push(o.ts); save("hl_histdel_"+k,t); }
