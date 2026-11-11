@@ -343,6 +343,7 @@ li.unmarked .name::after{content:attr(data-miss);display:block;font-size:13px;fo
 .lock-row button{font:inherit;font-weight:800;font-size:14px;border:0;border-radius:9px;padding:8px 14px;background:var(--accent);color:var(--accent-ink);cursor:pointer;white-space:nowrap}
 .pin-locked input{opacity:.4}
 .sec-msg{text-align:center;font-size:13.5px;font-weight:800;color:var(--muted);min-height:1em}
+.target .day-tg{display:block;font-size:10.5px;font-weight:800;color:var(--warn);line-height:1.2;margin-top:2px;white-space:nowrap}
 .pin-row{display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;width:100%}
 .pin-row input{box-sizing:border-box;max-width:100%}
 .pin-err:empty{display:none}
@@ -1152,9 +1153,17 @@ function stateOf(s){
   const prices = load("hl_prices_"+dataKey(s),{});
   s.products.forEach(p=>{ p.price = (p.id in prices) ? prices[p.id] : (p.basePrice ?? null); });
   const hidden = load("hl_hidden_"+dataKey(s),[]), removed = load("hl_removed_"+dataKey(s),[]);
-  return {targets,day,prices,names,extra,hidden,removed};
+  return {targets,day,prices,names,extra,hidden,removed,key:dataKey(s)};
 }
-const targetOf = (p,st) => (p.id in st.targets) ? st.targets[p.id] : p.target;
+// stock target for one weekday only (0=Sunday … 3=Wednesday … 6=Saturday), by data key (Rishon: no prefix, Jerusalem: "jlm_")
+// the regular target stays as it is and is what edit mode shows and changes
+const DAY_TARGETS = {
+  yeshm: { p1:{3:40} }   // פרי השדה · חציל: on Wednesday (the order for Thursday) 40 instead of 20
+};
+const DAY_NAMES = ["ראשון","שני","שלישי","רביעי","חמישי","שישי","שבת"];
+const dayTargetOf = (p,st,wd) => { const o=DAY_TARGETS[st.key]; const d=o && o[p.id]; return d && d[wd]!=null ? d[wd] : null; };
+const baseTargetOf = (p,st) => (p.id in st.targets) ? st.targets[p.id] : p.target;
+const targetOf = (p,st) => { const b=baseTargetOf(p,st); if(editing) return b; const w=dayTargetOf(p,st,new Date().getDay()); return w!=null ? w : b; };
 function orderOf(p,st){
   const t=targetOf(p,st), v=num(st.day.vals[p.id]);
   if(t==null) return v;
@@ -1621,7 +1630,7 @@ function showReports(){
 }
 document.getElementById("repBtn").addEventListener("click",showReports);
 // set when the site file (index.html) is built
-const APP_BUILD="11.11.2026 · 07:21";
+const APP_BUILD="12.11.2026 · 00:07";
 document.getElementById("appVer").textContent = APP_BUILD.startsWith("__") ? "גרסת תצוגה (קישור Claude)" : "עדכון אחרון של האפליקציה: "+APP_BUILD;
 function repPerUI(){ document.querySelectorAll("#repPer button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.p===repPeriod?"true":"false"));
   const box=document.getElementById("repRange"); box.hidden=repPeriod!=="custom";
@@ -1812,6 +1821,8 @@ function render(){
       ti.value=t==null?"":t; ti.setAttribute("aria-label",tr().lblTarget+pname(p));
       ti.addEventListener("input",()=>{ st.targets[p.id]=num(ti.value); saveTargets(); update(li,p); });
       tg.appendChild(ti);
+      const o=DAY_TARGETS[st.key] && DAY_TARGETS[st.key][p.id];
+      if(o) Object.keys(o).forEach(wd=>{ const n=document.createElement("small"); n.className="day-tg"; n.textContent="ביום "+DAY_NAMES[wd]+": "+o[wd]; tg.appendChild(n); });
     } else tg.textContent = t==null ? "—" : t;
     const inWrap=document.createElement("div");
     const inp=document.createElement("input"); inp.className="num"; inp.id="v_"+p.id; numField(inp);
