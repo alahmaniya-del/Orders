@@ -426,7 +426,21 @@ li.noname .name::after{content:attr(data-noname);display:block;font-size:13px;fo
 /* the very first launch of the home-screen app can report a short screen: paint the whole page in the app colour */
 html{background:var(--bg);min-height:100%}
 html:has(body.on-home){background:var(--bg)}
-@media (prefers-reduced-motion:reduce){.intro-bg{transition:none}}
+/* opening: a soft light in the middle, the logo opens out of it, then a line and the title letter by letter */
+.intro-bg{background-image:radial-gradient(120% 80% at 50% 42%,#27463a 0%,#1c322a 55%,#13231d 100%);transition:opacity .65s ease;display:flex;align-items:center;justify-content:center}
+.intro-in{display:flex;flex-direction:column;align-items:center;gap:18px;transform:translateY(-4vh)}
+.intro-logo{width:min(70vw,320px);background:linear-gradient(105deg,#c7c2b5 0%,#c7c2b5 40%,#fffaf0 50%,#c7c2b5 60%,#c7c2b5 100%) #c7c2b5;background-size:300% 100%;background-position:100% 0;
+  clip-path:circle(0% at 50% 55%);opacity:0;transform:scale(1.12);filter:blur(4px);
+  animation:introOpen 2s cubic-bezier(.22,.8,.25,1) .3s forwards, introShine 1.6s ease-in-out 2s forwards}
+.intro-line{display:block;height:1.5px;width:min(46vw,200px);background:linear-gradient(90deg,transparent,#c7c2b5,transparent);transform:scaleX(0);animation:introLine 1s cubic-bezier(.2,.7,.2,1) 2.1s forwards}
+.intro-t{font-family:var(--display);font-size:clamp(17px,4.8vw,22px);letter-spacing:.06em;color:#c7c2b5;white-space:nowrap}
+.intro-t span{display:inline-block;opacity:0;animation:introCh .35s ease-out forwards}
+.intro-reset *{animation:none!important}
+@keyframes introOpen{40%{opacity:1}to{clip-path:circle(75% at 50% 55%);opacity:1;transform:scale(1);filter:blur(0)}}
+@keyframes introShine{to{background-position:0 0}}
+@keyframes introLine{to{transform:scaleX(1)}}
+@keyframes introCh{from{opacity:0;transform:translateY(6px)}to{opacity:.92;transform:none}}
+@media (prefers-reduced-motion:reduce){.intro-bg{transition:none}.intro-logo,.intro-line,.intro-t span{animation:none;clip-path:none;filter:none;opacity:1;transform:none}}
 #homeView{position:relative;z-index:1}
 /* home fits one screen: the tiles share the space between the logo and the clock */
 #homeView{box-sizing:border-box;height:calc(var(--app-h,100dvh) - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));min-height:520px;display:flex;flex-direction:column;padding-bottom:84px}
@@ -493,7 +507,13 @@ body.kp-open #supView header{padding-block:4px 6px}
 <body>
 
 <div dir="rtl">
-  <div class="intro-bg" id="introBg" aria-hidden="true"></div>
+  <div class="intro-bg" id="introBg" aria-hidden="true">
+    <div class="intro-in">
+      <div class="logo intro-logo"></div>
+      <i class="intro-line"></i>
+      <div class="intro-t" aria-label="אפליקציית הזמנות לעסק"><span style="animation-delay:2.50s">א</span><span style="animation-delay:2.56s">פ</span><span style="animation-delay:2.62s">ל</span><span style="animation-delay:2.68s">י</span><span style="animation-delay:2.74s">ק</span><span style="animation-delay:2.80s">צ</span><span style="animation-delay:2.86s">י</span><span style="animation-delay:2.92s">י</span><span style="animation-delay:2.98s">ת</span><span style="animation-delay:3.04s">&nbsp;</span><span style="animation-delay:3.10s">ה</span><span style="animation-delay:3.16s">ז</span><span style="animation-delay:3.22s">מ</span><span style="animation-delay:3.28s">נ</span><span style="animation-delay:3.34s">ו</span><span style="animation-delay:3.40s">ת</span><span style="animation-delay:3.46s">&nbsp;</span><span style="animation-delay:3.52s">ל</span><span style="animation-delay:3.58s">ע</span><span style="animation-delay:3.64s">ס</span><span style="animation-delay:3.70s">ק</span></div>
+    </div>
+  </div>
   <div class="home-bg" id="homeBg" aria-hidden="true"></div>
   <section id="homeView" class="wrap">
     <div class="home-head">
@@ -1630,7 +1650,7 @@ function showReports(){
 }
 document.getElementById("repBtn").addEventListener("click",showReports);
 // set when the site file (index.html) is built
-const APP_BUILD="12.11.2026 · 00:07";
+const APP_BUILD="18.11.2026 · 18:49";
 document.getElementById("appVer").textContent = APP_BUILD.startsWith("__") ? "גרסת תצוגה (קישור Claude)" : "עדכון אחרון של האפליקציה: "+APP_BUILD;
 function repPerUI(){ document.querySelectorAll("#repPer button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.p===repPeriod?"true":"false"));
   const box=document.getElementById("repRange"); box.hidden=repPeriod!=="custom";
@@ -2484,9 +2504,26 @@ document.addEventListener("visibilitychange",()=>{ if(!document.hidden) tick(); 
 showHome();
 (function(){
   const ib=document.getElementById("introBg"); if(!ib) return;
+  let t1=0,t2=0;
   const done=()=>{ ib.hidden=true; };
-  setTimeout(()=>{ ib.classList.add("out"); setTimeout(done,1100); },1000);
-  ib.addEventListener("click",()=>{ ib.classList.add("out"); setTimeout(done,400); });
+  const end=(ms)=>{ clearTimeout(t1); clearTimeout(t2); ib.classList.add("out"); t2=setTimeout(done,ms); };
+  const play=()=>{
+    clearTimeout(t1); clearTimeout(t2);
+    ib.hidden=false; ib.classList.remove("out");
+    // restart every animation of the opening from the beginning
+    // (a class, so the letter-by-letter delays written on each letter stay as they are)
+    ib.classList.add("intro-reset"); void ib.offsetWidth; ib.classList.remove("intro-reset");
+    t1=setTimeout(()=>end(700),4600);
+  };
+  ib.addEventListener("click",()=>end(400));
+  play();
+  // coming back to the app (after leaving it for a few seconds) plays the opening again
+  let leftAt=0;
+  document.addEventListener("visibilitychange",()=>{
+    if(document.hidden){ leftAt=Date.now(); return; }
+    if(leftAt && Date.now()-leftAt>3000) play();
+  });
+  window.addEventListener("pageshow",e=>{ if(e.persisted) play(); });
 })();
 
 // self-update: the home-screen app can keep an old copy for hours, so ask the server for the latest build
