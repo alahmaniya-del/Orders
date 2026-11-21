@@ -59,6 +59,22 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
 .home-gear{position:absolute;top:-16px;inset-inline-end:-6px;display:flex;align-items:center;justify-content:center;width:42px;height:42px;padding:0;color:var(--accent);background:rgba(28,50,42,.10);border:0;border-radius:50%;cursor:pointer}
 /* reports */
 #repView{padding-bottom:60px}
+#setView{padding-bottom:60px}
+.set-grp-h{font-size:13px;font-weight:800;color:var(--muted);letter-spacing:.04em;margin:18px 6px 6px}
+.set-list{background:var(--card,var(--field));border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.set-item{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:12px;width:100%;padding:13px 14px;border-bottom:1px solid var(--line);cursor:pointer;color:var(--ink);text-align:start}
+.set-item:last-child{border-bottom:0}
+.set-item.static{cursor:default}
+.set-item:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.set-ic{flex:0 0 auto;width:38px;height:38px;border-radius:10px;background:rgba(28,50,42,.10);color:var(--accent);display:flex;align-items:center;justify-content:center}
+.set-tx{flex:1;min-width:0;display:flex;flex-direction:column}
+.set-tx b{font-weight:800;font-size:16px}
+.set-tx small{color:var(--muted);font-weight:700;font-size:12.5px;margin-top:2px}
+.set-tx small.app-ver{margin:2px 0 0;padding:0;border:0;text-align:start;font-size:12.5px;color:var(--muted)}
+.set-ch{color:var(--muted);font-size:22px;font-weight:700;line-height:1}
+.set-note{color:var(--muted);font-weight:700;font-size:13.5px;margin:14px 6px 8px}
+.set-cnt{color:var(--muted);font-weight:800;font-size:13px;white-space:nowrap}
+#setSec .sec{margin-top:14px;border-top:0;padding-top:0}
 .rep-ctrl{display:block;margin:16px 0 8px}
 .rep-ctrl label{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:800;color:var(--muted)}
 .rep-ctrl select{font:inherit;font-size:16px;font-weight:700;color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:10px;padding:10px 8px;width:100%}
@@ -630,8 +646,35 @@ body.kp-open #supView header{padding-block:4px 6px}
       <button type="button" class="rep-btn ghost" id="repCsv">ייצוא לאקסל</button>
     </div>
     <div class="rep-status" id="repStatus" role="status"></div>
-    <div class="sec">
-      <div class="sec-h">אבטחה</div>
+  </section>
+
+  <section id="setView" class="wrap" hidden>
+    <header>
+      <button class="back" id="setBack" type="button">→ חזרה</button>
+      <h1 class="sname" id="setTitle">הגדרות</h1>
+    </header>
+    <div id="setMain">
+      <div class="set-grp-h">נתונים</div>
+      <div class="set-list">
+        <button type="button" class="set-item" id="setRep"><span class="set-ic"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg></span><span class="set-tx"><b>דוחות</b><small>סכומים לפי ספק ותקופה · PDF ואקסל</small></span><span class="set-ch" aria-hidden="true">‹</span></button>
+        <button type="button" class="set-item" id="setHistBtn"><span class="set-ic"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><span class="set-tx"><b>היסטוריית הזמנות</b><small>כל ההזמנות של כל ספק</small></span><span class="set-ch" aria-hidden="true">‹</span></button>
+      </div>
+      <div class="set-grp-h">אבטחה</div>
+      <div class="set-list">
+        <button type="button" class="set-item" id="setSecBtn"><span class="set-ic"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span><span class="set-tx"><b>קוד וזיהוי פנים</b><small>החלפת קוד · זיהוי פנים · טלפונים חסומים</small></span><span class="set-ch" aria-hidden="true">‹</span></button>
+      </div>
+      <div class="set-grp-h">מידע</div>
+      <div class="set-list">
+        <div class="set-item static"><span class="set-ic"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18"/><path d="M5 21V8l7-5 7 5v13"/><path d="M9 21v-6h6v6"/></svg></span><span class="set-tx"><b>סניף</b><small id="setBranch"></small></span></div>
+        <div class="set-item static"><span class="set-ic"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg></span><span class="set-tx"><b>גרסה</b><small class="app-ver" id="appVer"></small></span></div>
+      </div>
+    </div>
+    <div id="setHist" hidden>
+      <p class="set-note">בחר ספק כדי לראות את כל ההזמנות שלו</p>
+      <div class="set-list" id="setHistList"></div>
+    </div>
+    <div id="setSec" hidden>
+      <div class="sec">
       <button type="button" class="sec-b" id="fidSet" hidden></button>
       <button type="button" class="sec-b warn" id="fidAll"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/></svg><span>בטל זיהוי פנים בכל הטלפונים</span></button>
       <button type="button" class="sec-b" id="pinChg"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>החלף קוד</button>
@@ -643,9 +686,8 @@ body.kp-open #supView header{padding-block:4px 6px}
       <div class="lock-list" id="lockList"></div>
       <div class="sec-msg" id="secMsg" role="status"></div>
     </div>
-    <div class="app-ver" id="appVer"></div>
+    </div>
   </section>
-
   <section id="docView" class="wrap" hidden>
     <header>
       <button class="back" id="docBack" type="button">→ חזרה</button>
@@ -1334,6 +1376,7 @@ function showHome(){
   // leaving a supplier starts its next order clean
   if(cur) save("hl_day_"+dataKey(cur),{date:todayKey(),vals:{},note:""});
   cur=null; editing=false; pinOk=false; closeKeypad(); L="he"; applyLang();
+  document.getElementById("setView").hidden=true; histFromSet=false;
   supView.hidden=true; bar.hidden=true; homeView.hidden=false; document.getElementById("homeBg").hidden=false; document.body.classList.add("on-home"); document.getElementById("histView").hidden=true; document.getElementById("repView").hidden=true; document.getElementById("docView").hidden=true;
   const tiles=document.getElementById("tiles"); tiles.innerHTML="";
   // home order, read in pairs: right column, left column (per branch)
@@ -1641,16 +1684,48 @@ function showReports(){
   homeView.hidden=true; supView.hidden=true; bar.hidden=true; document.getElementById("histView").hidden=true;
   document.getElementById("homeBg").hidden=true; document.body.classList.remove("on-home");
   document.getElementById("repView").hidden=false;
-  secMsg(""); document.getElementById("pinForm").hidden=true; fidUI(); lockUI();
+  document.getElementById("setView").hidden=true;
   document.getElementById("repTitle").textContent="דוחות · סניף "+branch().name;
   const sSel=document.getElementById("repSup"); sSel.innerHTML=""; sSel.add(new Option("כל הספקים","all"));
   repSups().forEach(s=>sSel.add(new Option(supTitle(s),s.id)));
   repPeriod="day"; repPerUI();
   renderReport(); window.scrollTo(0,0);
 }
-document.getElementById("repBtn").addEventListener("click",showReports);
+// ---------- settings: one screen with categories; each category opens its own screen
+let setPanel="main";
+function showSettings(panel){
+  closeKeypad(); setPanel=panel||"main";
+  homeView.hidden=true; supView.hidden=true; bar.hidden=true;
+  ["histView","repView","docView"].forEach(id=>{ const el=document.getElementById(id); if(el) el.hidden=true; });
+  document.getElementById("homeBg").hidden=true; document.body.classList.remove("on-home");
+  document.getElementById("setView").hidden=false;
+  document.getElementById("setMain").hidden=setPanel!=="main";
+  document.getElementById("setHist").hidden=setPanel!=="hist";
+  document.getElementById("setSec").hidden=setPanel!=="sec";
+  document.getElementById("setTitle").textContent= setPanel==="hist" ? "היסטוריית הזמנות" : setPanel==="sec" ? "קוד וזיהוי פנים" : "הגדרות";
+  document.getElementById("setBranch").textContent=branch().name;
+  if(setPanel==="sec"){ secMsg(""); document.getElementById("pinForm").hidden=true; fidUI(); lockUI(); }
+  if(setPanel==="hist"){
+    const L=document.getElementById("setHistList"); L.innerHTML="";
+    repSups().forEach(sp=>{
+      const n=load("hl_hist_"+dataKey(sp),[]).length;
+      const b=document.createElement("button"); b.type="button"; b.className="set-item";
+      b.innerHTML='<span class="set-tx"><b></b></span><span class="set-cnt"></span><span class="set-ch" aria-hidden="true">‹</span>';
+      b.querySelector("b").textContent=supTitle(sp); b.querySelector(".set-cnt").textContent=n? n+" הזמנות" : "אין הזמנות";
+      b.addEventListener("click",()=>{ histFromSet=true; document.getElementById("setView").hidden=true; openSupplier(sp); showHistory(); });
+      L.appendChild(b);
+    });
+  }
+  window.scrollTo(0,0);
+}
+let histFromSet=false;
+document.getElementById("repBtn").addEventListener("click",()=>showSettings("main"));
+document.getElementById("setRep").addEventListener("click",showReports);
+document.getElementById("setHistBtn").addEventListener("click",()=>showSettings("hist"));
+document.getElementById("setSecBtn").addEventListener("click",()=>showSettings("sec"));
+document.getElementById("setBack").addEventListener("click",()=>{ if(setPanel!=="main") showSettings("main"); else { pinOk=false; showHome(); } });
 // set when the site file (index.html) is built
-const APP_BUILD="18.11.2026 · 18:49";
+const APP_BUILD="21.11.2026 · 21:22";
 document.getElementById("appVer").textContent = APP_BUILD.startsWith("__") ? "גרסת תצוגה (קישור Claude)" : "עדכון אחרון של האפליקציה: "+APP_BUILD;
 function repPerUI(){ document.querySelectorAll("#repPer button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.p===repPeriod?"true":"false"));
   const box=document.getElementById("repRange"); box.hidden=repPeriod!=="custom";
@@ -1659,7 +1734,7 @@ function repPerUI(){ document.querySelectorAll("#repPer button").forEach(b=>b.se
 ["repFrom","repTo"].forEach(id=>document.getElementById(id).addEventListener("change",()=>{ if(repPeriod==="custom") renderReport(); }));
 document.querySelectorAll("#repPer button").forEach(b=>b.addEventListener("click",()=>{ repPeriod=b.dataset.p; repPerUI(); renderReport(); }));
 document.getElementById("repSup").addEventListener("change",renderReport);
-document.getElementById("repBack").addEventListener("click",()=>{ pinOk=false; showHome(); });
+document.getElementById("repBack").addEventListener("click",()=>showSettings("main"));
 function repFileName(ext){ const m=repModel(); return ("דוח הלחמניא - "+branch().name+" - "+m.title.split("· ")[1]+" - "+repRange()[2].replace(" · "," ").replace(/–/g,"-")).replace(/["״/\\]/g,"")+"."+ext; }
 async function deliverFile(blob,fname){
   const dl = window.claude && window.claude.use ? await window.claude.use('downloads') : null;
@@ -2179,6 +2254,7 @@ function showHistory(){
 document.getElementById("histBtn").addEventListener("click",showHistory);
 
 document.getElementById("histBack").addEventListener("click",()=>{
+  if(histFromSet){ histFromSet=false; document.getElementById("histView").hidden=true; showSettings("hist"); return; }
   pinOk=false; // leaving a locked page locks it again
   document.getElementById("histView").hidden=true; supView.hidden=false; bar.hidden=false; window.scrollTo(0,0);
 });
@@ -2529,6 +2605,12 @@ showHome();
 // self-update: the home-screen app can keep an old copy for hours, so ask the server for the latest build
 (function(){
   let busy=false;
+  // the home-screen app always opens the plain address: after an update, store the new copy under that address
+  // so the next launch opens straight with the new opening, not the old one
+  if(/[?&]v=/.test(location.search)){
+    fetch(location.pathname,{cache:"reload"}).catch(()=>{});
+    try{ history.replaceState(null,"",location.pathname+location.hash); }catch(e){}
+  }
   async function checkUpdate(){
     if(busy || !navigator.onLine) return; busy=true;
     try{
@@ -2538,10 +2620,11 @@ showHome();
       if(homeView.hidden) return;
       let n=0; try{ n=+sessionStorage.getItem("hl_upd_n")||0; sessionStorage.setItem("hl_upd_n",n+1); }catch(e){}
       if(n>=3) return;
+      try{ await fetch(location.pathname,{cache:"reload"}); }catch(e){}
       location.replace(location.pathname+"?v="+Date.now());
     }catch(e){} finally{ busy=false; }
   }
-  setTimeout(checkUpdate,1500);
+  setTimeout(checkUpdate,200); // right away, while the opening is still on screen
   setInterval(()=>{ if(!document.hidden) checkUpdate(); },60000);
   document.addEventListener("visibilitychange",()=>{ if(!document.hidden) checkUpdate(); });
   window.addEventListener("pageshow",e=>{ if(e.persisted) checkUpdate(); });
