@@ -141,7 +141,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
 .rep-ctrl{display:block;margin:16px 0 8px}
 .rep-ctrl label{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:800;color:var(--muted)}
 .rep-ctrl select{font:inherit;font-size:16px;font-weight:700;color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:10px;padding:10px 8px;width:100%}
-.rep-sum{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:14px 0}
+.rep-sum{display:grid;grid-template-columns:1fr;gap:10px;margin:14px 0}
 .rep-sum div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 8px;text-align:center}
 .rep-sum b{display:block;font-size:25px;font-variant-numeric:tabular-nums}
 .rep-sum div{padding:16px 8px!important}
@@ -760,7 +760,7 @@ body.kp-open #supView header{padding-block:4px 6px}
     <div id="anaOut"></div>
     <div class="ana-card ana-ed" id="anaEd" hidden>
       <h3>מסגרת חודשית לכל ספק</h3>
-      <div class="ana-note" style="text-align:start;margin:0 0 6px">לפני מע״מ. השאר ריק — המסגרת תחושב לבד לפי ממוצע 3 החודשים הקודמים.</div>
+      <div class="ana-note" style="text-align:start;margin:0 0 6px">כולל מע״מ. השאר ריק — המסגרת תחושב לבד לפי ממוצע 3 החודשים הקודמים.</div>
       <div id="anaEdList"></div>
       <button type="button" class="ana-btn pri" id="anaEdSave">שמור מסגרות</button>
       <button type="button" class="ana-btn" id="anaEdCancel">ביטול</button>
@@ -884,7 +884,7 @@ body.kp-open #supView header{padding-block:4px 6px}
 
   <div class="bar" id="bar" hidden>
     <div class="total" id="totalBox" hidden>
-      <span id="totalLbl">סה״כ הזמנה · לפני מע״מ</span>
+      <span id="totalLbl">סה״כ הזמנה · כולל מע״מ</span>
       <b id="totalSum">₪0</b>
     </div>
     <div class="total-note" id="totalNote" hidden></div>
@@ -1073,6 +1073,7 @@ const hasPrices = s => s.products.some(p=>p.price!=null);
 // shekel sign on the left of the amount, kept left-to-right (e.g. ₪ 3,806.00)
 const money = n => "\u2066₪ "+(Math.round(n*100)/100).toLocaleString("he-IL",{minimumFractionDigits:2,maximumFractionDigits:2})+"\u2069";
 const VAT = 0.18;
+const gv = x => Math.round(x*(1+VAT)*100)/100; // shown amounts include VAT
 function totalOf(s){
   let sum=0, noPrice=0;
   linesOf(s,st).forEach(x=>{ if(x.p.price!=null) sum+=x.p.price*x.o; else noPrice++; });
@@ -1090,7 +1091,7 @@ const T = {
       preparing:"מכין את ההזמנה…", cancelled:"השליחה בוטלה", busy:"חלון כבר פתוח, נסה שוב בעוד רגע", fail:"לא הצלחתי להכין את ההזמנה. נסה שוב.",
       noLib:"לא הצלחתי לטעון את כלי ה-PDF. נסה לרענן את הדף.", noDl:"שליחת קבצים לא זמינה כאן. נסה לפתוח את הדף מחדש.",
       ready:"ההזמנה מוכנה – לחץ לשליחה", tapAgain:"לחץ שוב כדי לפתוח את השיתוף", shareFail:"לא הצלחתי לשתף. נסה שוב.",
-      lblTarget:"יעד ", noPrice:"חסר מחיר", del:"מחק", dlgDelQ:"אתה בטוח למחוק מוצר זה?", dlgHideQ:"אתה בטוח להסתיר מוצר זה?", dlgDelYes:"כן, מחק", dlgHideYes:"כן, הסתר", dlgNo:"ביטול", hide:"הסתר", show:"הצג", actsCol:"פעולות", deleted:n=>"המוצר \""+n+"\" נמחק", nameLbl:"שם המוצר", nameReq:"חובה לתת שם למוצר החדש", addProd:"+ הוסף מוצר", newProd:"מוצר חדש", updPrice:"עדכן מחיר", priceLbl:"מחיר ₪", editFinish:"סיים עריכה", pinQ:"הקלד קוד", pinWrong:"קוד שגוי, נסה שוב", pinNo:"ביטול", oaTitle:"חרגת מההזמנה הקודמת ב:", monthLine:(m,v)=>"לאחר הזמנה זו, סה״כ חודש "+m+": "+money(v), monthUp:(m,v,d)=>"יותר מחודש "+m+" ("+money(v)+") ב-"+money(d), monthDown:(m,v,d)=>"פחות מחודש "+m+" ("+money(v)+") ב-"+money(d), monthSame:m=>"בדיוק כמו חודש "+m, monthNone:m=>"אין עדיין נתונים לחודש "+m, gaTitle:"כל הכבוד! הוזלת מההזמנה הקודמת ב:", oaTitleU:"הזמנת יותר מההזמנה הקודמת ב:", gaTitleU:"כל הכבוד! הזמנת פחות מההזמנה הקודמת ב:", unitsN:n=>n+" יחידות", oaDetailU:(p,n)=>"הקודמת: "+p+" יח׳  ·  עכשיו: "+n+" יח׳", gaYes:"שלח הזמנה", gaNo:"חזרה", oaAmount:d=>money(d), oaDetail:(prev,now)=>"הקודמת: "+money(prev)+"  ·  עכשיו: "+money(now)+"  (לפני מע״מ)", oaYes:"אשר ושלח", oaNo:"ביטול", oaCancelled:"השליחה בוטלה – אפשר לתקן את הכמויות", smart:"הזמנה חכמה", smartArm:"לחץ שוב למילוי", smartFull:"עוד אין היסטוריה לספק הזה – מולאה הזמנה מלאה לפי היעדים. בדוק ותקן לפני השליחה.", smartDone:n=>"מולא לפי ממוצע "+(n===1?"ההזמנה האחרונה":n+" ההזמנות האחרונות")+". בדוק ותקן לפני השליחה.", totalLbl:"סה״כ הזמנה · לפני מע״מ", perUnit:"ליח׳", noPriceN:n=>(n===1?"מוצר אחד":n+" מוצרים")+" בהזמנה בלי מחיר – לא נכללים בסכום", search:"חיפוש", notFinal:"סכום לא סופי · לפני מע״מ", notFinalShort:"לא סופי", noPricesShort:"אין מחירים", noPricesAll:"לספק הזה אין מחירים – אין סכום להזמנה", histTotal:"סה״כ לפני מע״מ", monthSoFar:(n,t,g)=>["סיכום עד כה: "+money(t)+" לפני מע״מ","כולל מע״מ: "+money(g)+"  ·  "+n+(n===1?" הזמנה":" הזמנות")], monthCount:n=>n+(n===1?" הזמנה":" הזמנות")+" החודש", vatLbl:"מע״מ 18%", grandLbl:"סה״כ כולל מע״מ", hist:"היסטוריה", histBack:"→ חזרה", histTitle:n=>"היסטוריית הזמנות · "+n, histEmpty:"עוד לא נשלחו הזמנות לספק הזה.", histSwipe:"להסרת הזמנה – החלק אותה ימינה", histDelQ:"למחוק את ההזמנה הזו מההיסטוריה?", pinPh:"קוד", histCount:n=>n+" מוצרים", noteWord:"הערה: ", missRow:"לא סומן – רשום כמות (גם 0)", notMarked:n=>(n===1?"מוצר אחד לא סומן":n+" מוצרים לא סומנו")+". סמן הכול לפני השליחה.", lblLeft:"נשאר במלאי ", lblQty:"כמות להזמנה ", locale:"he-IL", dir:"rtl"},
+      lblTarget:"יעד ", noPrice:"חסר מחיר", del:"מחק", dlgDelQ:"אתה בטוח למחוק מוצר זה?", dlgHideQ:"אתה בטוח להסתיר מוצר זה?", dlgDelYes:"כן, מחק", dlgHideYes:"כן, הסתר", dlgNo:"ביטול", hide:"הסתר", show:"הצג", actsCol:"פעולות", deleted:n=>"המוצר \""+n+"\" נמחק", nameLbl:"שם המוצר", nameReq:"חובה לתת שם למוצר החדש", addProd:"+ הוסף מוצר", newProd:"מוצר חדש", updPrice:"עדכן מחיר", priceLbl:"מחיר ₪", editFinish:"סיים עריכה", pinQ:"הקלד קוד", pinWrong:"קוד שגוי, נסה שוב", pinNo:"ביטול", oaTitle:"חרגת מההזמנה הקודמת ב:", monthLine:(m,v)=>"לאחר הזמנה זו, סה״כ חודש "+m+": "+money(gv(v)), monthUp:(m,v,d)=>"יותר מחודש "+m+" ("+money(gv(v))+") ב-"+money(gv(d)), monthDown:(m,v,d)=>"פחות מחודש "+m+" ("+money(gv(v))+") ב-"+money(gv(d)), monthSame:m=>"בדיוק כמו חודש "+m, monthNone:m=>"אין עדיין נתונים לחודש "+m, gaTitle:"כל הכבוד! הוזלת מההזמנה הקודמת ב:", oaTitleU:"הזמנת יותר מההזמנה הקודמת ב:", gaTitleU:"כל הכבוד! הזמנת פחות מההזמנה הקודמת ב:", unitsN:n=>n+" יחידות", oaDetailU:(p,n)=>"הקודמת: "+p+" יח׳  ·  עכשיו: "+n+" יח׳", gaYes:"שלח הזמנה", gaNo:"חזרה", oaAmount:d=>money(gv(d)), oaDetail:(prev,now)=>"הקודמת: "+money(gv(prev))+"  ·  עכשיו: "+money(gv(now))+"  (כולל מע״מ)", oaYes:"אשר ושלח", oaNo:"ביטול", oaCancelled:"השליחה בוטלה – אפשר לתקן את הכמויות", smart:"הזמנה חכמה", smartArm:"לחץ שוב למילוי", smartFull:"עוד אין היסטוריה לספק הזה – מולאה הזמנה מלאה לפי היעדים. בדוק ותקן לפני השליחה.", smartDone:n=>"מולא לפי ממוצע "+(n===1?"ההזמנה האחרונה":n+" ההזמנות האחרונות")+". בדוק ותקן לפני השליחה.", totalLbl:"סה״כ הזמנה · כולל מע״מ", perUnit:"ליח׳", noPriceN:n=>(n===1?"מוצר אחד":n+" מוצרים")+" בהזמנה בלי מחיר – לא נכללים בסכום", search:"חיפוש", notFinal:"סכום לא סופי · כולל מע״מ", notFinalShort:"לא סופי", noPricesShort:"אין מחירים", noPricesAll:"לספק הזה אין מחירים – אין סכום להזמנה", histTotal:"סה״כ כולל מע״מ", monthSoFar:(n,g)=>["סיכום עד כה: "+money(g)+" כולל מע״מ",n+(n===1?" הזמנה":" הזמנות")], monthCount:n=>n+(n===1?" הזמנה":" הזמנות")+" החודש", vatLbl:"מע״מ 18%", grandLbl:"סה״כ כולל מע״מ", hist:"היסטוריה", histBack:"→ חזרה", histTitle:n=>"היסטוריית הזמנות · "+n, histEmpty:"עוד לא נשלחו הזמנות לספק הזה.", histSwipe:"להסרת הזמנה – החלק אותה ימינה", histDelQ:"למחוק את ההזמנה הזו מההיסטוריה?", pinPh:"קוד", histCount:n=>n+" מוצרים", noteWord:"הערה: ", missRow:"לא סומן – רשום כמות (גם 0)", notMarked:n=>(n===1?"מוצר אחד לא סומן":n+" מוצרים לא סומנו")+". סמן הכול לפני השליחה.", lblLeft:"נשאר במלאי ", lblQty:"כמות להזמנה ", locale:"he-IL", dir:"rtl"},
   fr:{back:"← Fournisseurs", edit:"Modifier", editDone:"Terminer", clear:"Effacer la commande", clearQ:"Effacer toute la commande ?", clearYes:"Oui, effacer", clearNo:"Annuler", cleared:"Commande effacée",
       cols:["Produit","Objectif","Reste","À commander"], empty:"Aucun produit pour ce fournisseur.",
       noteLabel:"Note pour le fournisseur (facultatif)", notePh:"Ex. : livrer avant 7h00", preview:"Aperçu de la commande", send:"Envoyer la commande",
@@ -1100,7 +1101,7 @@ const T = {
       preparing:"Préparation de la commande…", cancelled:"Envoi annulé", busy:"Une fenêtre est déjà ouverte, réessayez dans un instant", fail:"Impossible de préparer la commande. Réessayez.",
       noLib:"Impossible de charger l’outil PDF. Rechargez la page.", noDl:"L’envoi de fichiers n’est pas disponible ici. Rouvrez la page.",
       ready:"Commande prête – appuyez pour envoyer", tapAgain:"Appuyez encore pour ouvrir le partage", shareFail:"Partage impossible. Réessayez.",
-      lblTarget:"Objectif ", noPrice:"Prix manquant", del:"Suppr.", dlgDelQ:"Supprimer ce produit ?", dlgHideQ:"Masquer ce produit ?", dlgDelYes:"Oui, supprimer", dlgHideYes:"Oui, masquer", dlgNo:"Annuler", hide:"Masquer", show:"Afficher", actsCol:"Actions", deleted:n=>"Produit « "+n+" » supprimé", nameLbl:"Nom du produit", nameReq:"Donnez un nom au nouveau produit", addProd:"+ Ajouter un produit", newProd:"Nouveau produit", updPrice:"Modifier le prix", priceLbl:"Prix ₪", editFinish:"Terminer la modification", pinQ:"Entrez le code", pinWrong:"Code incorrect, réessayez", pinNo:"Annuler", oaTitle:"Dépassement par rapport à la commande précédente :", monthLine:(m,v)=>"Après cette commande, total de "+m+" : "+money(v), monthUp:(m,v,d)=>"Plus que "+m+" ("+money(v)+") de "+money(d), monthDown:(m,v,d)=>"Moins que "+m+" ("+money(v)+") de "+money(d), monthSame:m=>"Identique à "+m, monthNone:m=>"Pas encore de données pour "+m, gaTitle:"Bravo ! Économie par rapport à la commande précédente :", oaTitleU:"Plus que la commande précédente :", gaTitleU:"Bravo ! Moins que la commande précédente :", unitsN:n=>n+" unités", oaDetailU:(p,n)=>"Précédente : "+p+" u.  ·  Actuelle : "+n+" u.", gaYes:"Envoyer la commande", gaNo:"Retour", oaAmount:d=>money(d), oaDetail:(prev,now)=>"Précédente : "+money(prev)+"  ·  Actuelle : "+money(now)+"  (HT)", oaYes:"Confirmer et envoyer", oaNo:"Annuler", oaCancelled:"Envoi annulé – vous pouvez corriger les quantités", smart:"Commande intelligente", smartArm:"Appuyez encore pour remplir", smartFull:"Pas encore d’historique – commande complète selon les objectifs. Vérifiez avant l’envoi.", smartDone:n=>"Rempli selon la moyenne des "+n+" dernières commandes. Vérifiez avant l’envoi.", totalLbl:"Total commande · HT", perUnit:"/u", noPriceN:n=>n+" produit(s) sans prix – non inclus", search:"Chercher", notFinal:"Total provisoire · HT", notFinalShort:"provisoire", noPricesShort:"sans prix", noPricesAll:"Pas de prix pour ce fournisseur – pas de total", histTotal:"Total HT", monthSoFar:(n,t,g)=>["Total à ce jour : "+money(t)+" HT","TTC : "+money(g)+"  ·  "+n+" commande(s)"], monthCount:n=>n+" commande(s)", vatLbl:"TVA 18 %", grandLbl:"Total TTC", hist:"Historique", histBack:"← Retour", histTitle:n=>"Historique des commandes · "+n, histEmpty:"Aucune commande envoyée pour ce fournisseur.", histSwipe:"Pour supprimer une commande, glissez-la vers la gauche", histDelQ:"Supprimer cette commande de l’historique ?", pinPh:"Code", histCount:n=>n+" produits", noteWord:"Note : ", missRow:"Non renseigné – saisissez une quantité (même 0)", notMarked:n=>(n===1?"1 produit non renseigné":n+" produits non renseignés")+". Complétez tout avant l’envoi.", lblLeft:"Reste en stock ", lblQty:"Quantité à commander ", locale:"fr-FR", dir:"ltr"},
+      lblTarget:"Objectif ", noPrice:"Prix manquant", del:"Suppr.", dlgDelQ:"Supprimer ce produit ?", dlgHideQ:"Masquer ce produit ?", dlgDelYes:"Oui, supprimer", dlgHideYes:"Oui, masquer", dlgNo:"Annuler", hide:"Masquer", show:"Afficher", actsCol:"Actions", deleted:n=>"Produit « "+n+" » supprimé", nameLbl:"Nom du produit", nameReq:"Donnez un nom au nouveau produit", addProd:"+ Ajouter un produit", newProd:"Nouveau produit", updPrice:"Modifier le prix", priceLbl:"Prix ₪", editFinish:"Terminer la modification", pinQ:"Entrez le code", pinWrong:"Code incorrect, réessayez", pinNo:"Annuler", oaTitle:"Dépassement par rapport à la commande précédente :", monthLine:(m,v)=>"Après cette commande, total de "+m+" : "+money(gv(v)), monthUp:(m,v,d)=>"Plus que "+m+" ("+money(gv(v))+") de "+money(gv(d)), monthDown:(m,v,d)=>"Moins que "+m+" ("+money(gv(v))+") de "+money(gv(d)), monthSame:m=>"Identique à "+m, monthNone:m=>"Pas encore de données pour "+m, gaTitle:"Bravo ! Économie par rapport à la commande précédente :", oaTitleU:"Plus que la commande précédente :", gaTitleU:"Bravo ! Moins que la commande précédente :", unitsN:n=>n+" unités", oaDetailU:(p,n)=>"Précédente : "+p+" u.  ·  Actuelle : "+n+" u.", gaYes:"Envoyer la commande", gaNo:"Retour", oaAmount:d=>money(gv(d)), oaDetail:(prev,now)=>"Précédente : "+money(gv(prev))+"  ·  Actuelle : "+money(gv(now))+"  (TTC)", oaYes:"Confirmer et envoyer", oaNo:"Annuler", oaCancelled:"Envoi annulé – vous pouvez corriger les quantités", smart:"Commande intelligente", smartArm:"Appuyez encore pour remplir", smartFull:"Pas encore d’historique – commande complète selon les objectifs. Vérifiez avant l’envoi.", smartDone:n=>"Rempli selon la moyenne des "+n+" dernières commandes. Vérifiez avant l’envoi.", totalLbl:"Total commande · TTC", perUnit:"/u", noPriceN:n=>n+" produit(s) sans prix – non inclus", search:"Chercher", notFinal:"Total provisoire · TTC", notFinalShort:"provisoire", noPricesShort:"sans prix", noPricesAll:"Pas de prix pour ce fournisseur – pas de total", histTotal:"Total TTC", monthSoFar:(n,g)=>["Total à ce jour : "+money(g)+" TTC",n+" commande(s)"], monthCount:n=>n+" commande(s)", vatLbl:"TVA 18 %", grandLbl:"Total TTC", hist:"Historique", histBack:"← Retour", histTitle:n=>"Historique des commandes · "+n, histEmpty:"Aucune commande envoyée pour ce fournisseur.", histSwipe:"Pour supprimer une commande, glissez-la vers la gauche", histDelQ:"Supprimer cette commande de l’historique ?", pinPh:"Code", histCount:n=>n+" produits", noteWord:"Note : ", missRow:"Non renseigné – saisissez une quantité (même 0)", notMarked:n=>(n===1?"1 produit non renseigné":n+" produits non renseignés")+". Complétez tout avant l’envoi.", lblLeft:"Reste en stock ", lblQty:"Quantité à commander ", locale:"fr-FR", dir:"ltr"},
   ti:{back:"← ኩሎም ኣቕረብቲ", edit:"ምእራም", editDone:"ወድእ", clear:"ትእዛዝ ኣጽሪ", clearQ:"ነቲ ትእዛዝ ከተጽርዮ ርግጸኛ ዲኻ?", clearYes:"እወ፡ ኣጽሪ", clearNo:"ሰርዝ", cleared:"ትእዛዝ ተጸርዩ",
       cols:["ፍርያት","ዕላማ","ዝተረፈ","ዝእዘዝ"], empty:"ንዚ ኣቕራቢ ገና ፍርያት የለን።",
       noteLabel:"መዘኻኸሪ ንኣቕራቢ (ግዴታ ኣይኮነን)", notePh:"ንኣብነት፡ ቅድሚ 7:00 ኣምጽእ", preview:"ትእዛዝ ርአ", send:"ትእዛዝ ስደድ",
@@ -1110,7 +1111,7 @@ const T = {
       preparing:"ትእዛዝ ይዳሎ ኣሎ…", cancelled:"ምስዳድ ተሰሪዙ", busy:"መስኮት ክፉት እዩ፡ ድሕሪ ቁሩብ ደጊምካ ፈትን", fail:"ትእዛዝ ክዳሎ ኣይከኣለን። ደጊምካ ፈትን።",
       noLib:"PDF ክጽዓን ኣይከኣለን። ገጹ ኣሐድስ።", noDl:"ፋይል ምስዳድ ኣብዚ ኣይከኣልን። ገጹ ደጊምካ ክፈቶ።",
       ready:"ትእዛዝ ድሉው እዩ – ንምስዳድ ጠውቕ", tapAgain:"ንምክፋት ደጊምካ ጠውቕ", shareFail:"ምክፋል ኣይከኣለን። ደጊምካ ፈትን።",
-      lblTarget:"ዕላማ ", noPrice:"ዋጋ የለን", del:"ደምስስ", dlgDelQ:"ነዚ ፍርያት ክትድምስሶ ርግጸኛ ዲኻ?", dlgHideQ:"ነዚ ፍርያት ክትሓብኦ ርግጸኛ ዲኻ?", dlgDelYes:"እወ፡ ደምስስ", dlgHideYes:"እወ፡ ሕባእ", dlgNo:"ሰርዝ", hide:"ሕባእ", show:"ኣርኢ", actsCol:"ተግባራት", deleted:n=>"\""+n+"\" ተደምሲሱ", nameLbl:"ስም ፍርያት", nameReq:"ንሓድሽ ፍርያት ስም ሃቦ", addProd:"+ ፍርያት ወስኽ", newProd:"ሓድሽ ፍርያት", updPrice:"ዋጋ ኣሐድስ", priceLbl:"ዋጋ ₪", editFinish:"ምእራም ወድእ", pinQ:"ኮድ ኣእቱ", pinWrong:"ጌጋ ኮድ፡ ደጊምካ ፈትን", pinNo:"ሰርዝ", oaTitle:"ካብ ዝሓለፈ ትእዛዝ ዝበዝሐ:", monthLine:(m,v)=>"ድሕሪ እዚ ትእዛዝ፡ ጠቕላላ "+m+": "+money(v), monthUp:(m,v,d)=>"ካብ "+m+" ("+money(v)+") ብ "+money(d)+" ይበዝሕ", monthDown:(m,v,d)=>"ካብ "+m+" ("+money(v)+") ብ "+money(d)+" ይውሕድ", monthSame:m=>"ምስ "+m+" ማዕረ", monthNone:m=>"ንወርሒ "+m+" ገና ሓበሬታ የለን", gaTitle:"ጽቡቕ! ካብ ዝሓለፈ ትእዛዝ ዝወሓደ:", oaTitleU:"ካብ ዝሓለፈ ትእዛዝ ዝበዝሐ:", gaTitleU:"ጽቡቕ! ካብ ዝሓለፈ ትእዛዝ ዝወሓደ:", unitsN:n=>n+" ኣሃዱታት", oaDetailU:(p,n)=>"ዝሓለፈ: "+p+"  ·  ሕጂ: "+n, gaYes:"ትእዛዝ ስደድ", gaNo:"ተመለስ", oaAmount:d=>money(d), oaDetail:(prev,now)=>"ዝሓለፈ: "+money(prev)+"  ·  ሕጂ: "+money(now)+"  (ብዘይ ታክስ)", oaYes:"ኣረጋግጽን ስደድን", oaNo:"ሰርዝ", oaCancelled:"ምስዳድ ተሰሪዙ – ብዝሒ ከተስተኻኽል ትኽእል", smart:"ብልሂ ትእዛዝ", smartArm:"ንምምላእ ደጊምካ ጠውቕ", smartFull:"ገና ታሪኽ የለን – ብመሰረት ዕላማ ምሉእ ትእዛዝ ተመሊኡ። ቅድሚ ምስዳድ ርአን ኣስተኻኽልን።", smartDone:n=>"ብማእከላይ ናይ "+n+" ዝሓለፉ ትእዛዛት ተመሊኡ። ቅድሚ ምስዳድ ርአ።", totalLbl:"ጠቕላላ ትእዛዝ · ብዘይ ታክስ", perUnit:"/ሓደ", noPriceN:n=>n+" ፍርያት ዋጋ የብሎምን – ኣብ ድምር ኣይኣተዉን", search:"ድለ", notFinal:"ዘይወዳእ ድምር · ብዘይ ታክስ", notFinalShort:"ዘይወዳእ", noPricesShort:"ዋጋ የለን", noPricesAll:"ንዚ ኣቕራቢ ዋጋ የለን – ድምር የለን", histTotal:"ጠቕላላ ብዘይ ታክስ", monthSoFar:(n,t,g)=>["ክሳብ ሕጂ: "+money(t)+" ብዘይ ታክስ","ምስ ታክስ: "+money(g)+"  ·  "+n+" ትእዛዛት"], monthCount:n=>n+" ትእዛዛት", vatLbl:"ታክስ 18%", grandLbl:"ጠቕላላ ምስ ታክስ", hist:"ታሪኽ", histBack:"← ተመለስ", histTitle:n=>"ታሪኽ ትእዛዛት · "+n, histEmpty:"ንዚ ኣቕራቢ ገና ትእዛዝ ኣይተላእከን።", histSwipe:"ትእዛዝ ንምድምሳስ – ንጸጋም ሰሓቦ", histDelQ:"ነዚ ትእዛዝ ካብ ታሪኽ ክትድምስሶ ርግጸኛ ዲኻ?", pinPh:"ኮድ", histCount:n=>n+" ፍርያት", noteWord:"መዘኻኸሪ: ", missRow:"ኣይተመልከተን – ብዝሒ ጽሓፍ (0 እውን)", notMarked:n=>n+" ፍርያት ኣይተመልከቱን። ቅድሚ ምስዳድ ኩሉ ምላእ።", lblLeft:"ኣብ መኽዘን ዝተረፈ ", lblQty:"ዝእዘዝ ብዝሒ ", locale:"ti-ER", dir:"ltr"}
+      lblTarget:"ዕላማ ", noPrice:"ዋጋ የለን", del:"ደምስስ", dlgDelQ:"ነዚ ፍርያት ክትድምስሶ ርግጸኛ ዲኻ?", dlgHideQ:"ነዚ ፍርያት ክትሓብኦ ርግጸኛ ዲኻ?", dlgDelYes:"እወ፡ ደምስስ", dlgHideYes:"እወ፡ ሕባእ", dlgNo:"ሰርዝ", hide:"ሕባእ", show:"ኣርኢ", actsCol:"ተግባራት", deleted:n=>"\""+n+"\" ተደምሲሱ", nameLbl:"ስም ፍርያት", nameReq:"ንሓድሽ ፍርያት ስም ሃቦ", addProd:"+ ፍርያት ወስኽ", newProd:"ሓድሽ ፍርያት", updPrice:"ዋጋ ኣሐድስ", priceLbl:"ዋጋ ₪", editFinish:"ምእራም ወድእ", pinQ:"ኮድ ኣእቱ", pinWrong:"ጌጋ ኮድ፡ ደጊምካ ፈትን", pinNo:"ሰርዝ", oaTitle:"ካብ ዝሓለፈ ትእዛዝ ዝበዝሐ:", monthLine:(m,v)=>"ድሕሪ እዚ ትእዛዝ፡ ጠቕላላ "+m+": "+money(gv(v)), monthUp:(m,v,d)=>"ካብ "+m+" ("+money(gv(v))+") ብ "+money(gv(d))+" ይበዝሕ", monthDown:(m,v,d)=>"ካብ "+m+" ("+money(gv(v))+") ብ "+money(gv(d))+" ይውሕድ", monthSame:m=>"ምስ "+m+" ማዕረ", monthNone:m=>"ንወርሒ "+m+" ገና ሓበሬታ የለን", gaTitle:"ጽቡቕ! ካብ ዝሓለፈ ትእዛዝ ዝወሓደ:", oaTitleU:"ካብ ዝሓለፈ ትእዛዝ ዝበዝሐ:", gaTitleU:"ጽቡቕ! ካብ ዝሓለፈ ትእዛዝ ዝወሓደ:", unitsN:n=>n+" ኣሃዱታት", oaDetailU:(p,n)=>"ዝሓለፈ: "+p+"  ·  ሕጂ: "+n, gaYes:"ትእዛዝ ስደድ", gaNo:"ተመለስ", oaAmount:d=>money(gv(d)), oaDetail:(prev,now)=>"ዝሓለፈ: "+money(gv(prev))+"  ·  ሕጂ: "+money(gv(now))+"  (ምስ ታክስ)", oaYes:"ኣረጋግጽን ስደድን", oaNo:"ሰርዝ", oaCancelled:"ምስዳድ ተሰሪዙ – ብዝሒ ከተስተኻኽል ትኽእል", smart:"ብልሂ ትእዛዝ", smartArm:"ንምምላእ ደጊምካ ጠውቕ", smartFull:"ገና ታሪኽ የለን – ብመሰረት ዕላማ ምሉእ ትእዛዝ ተመሊኡ። ቅድሚ ምስዳድ ርአን ኣስተኻኽልን።", smartDone:n=>"ብማእከላይ ናይ "+n+" ዝሓለፉ ትእዛዛት ተመሊኡ። ቅድሚ ምስዳድ ርአ።", totalLbl:"ጠቕላላ ትእዛዝ · ምስ ታክስ", perUnit:"/ሓደ", noPriceN:n=>n+" ፍርያት ዋጋ የብሎምን – ኣብ ድምር ኣይኣተዉን", search:"ድለ", notFinal:"ዘይወዳእ ድምር · ምስ ታክስ", notFinalShort:"ዘይወዳእ", noPricesShort:"ዋጋ የለን", noPricesAll:"ንዚ ኣቕራቢ ዋጋ የለን – ድምር የለን", histTotal:"ጠቕላላ ምስ ታክስ", monthSoFar:(n,g)=>["ክሳብ ሕጂ: "+money(g)+" ምስ ታክስ",n+" ትእዛዛት"], monthCount:n=>n+" ትእዛዛት", vatLbl:"ታክስ 18%", grandLbl:"ጠቕላላ ምስ ታክስ", hist:"ታሪኽ", histBack:"← ተመለስ", histTitle:n=>"ታሪኽ ትእዛዛት · "+n, histEmpty:"ንዚ ኣቕራቢ ገና ትእዛዝ ኣይተላእከን።", histSwipe:"ትእዛዝ ንምድምሳስ – ንጸጋም ሰሓቦ", histDelQ:"ነዚ ትእዛዝ ካብ ታሪኽ ክትድምስሶ ርግጸኛ ዲኻ?", pinPh:"ኮድ", histCount:n=>n+" ፍርያት", noteWord:"መዘኻኸሪ: ", missRow:"ኣይተመልከተን – ብዝሒ ጽሓፍ (0 እውን)", notMarked:n=>n+" ፍርያት ኣይተመልከቱን። ቅድሚ ምስዳድ ኩሉ ምላእ።", lblLeft:"ኣብ መኽዘን ዝተረፈ ", lblQty:"ዝእዘዝ ብዝሒ ", locale:"ti-ER", dir:"ltr"}
 };
 let L="he";
 const tr = () => T[L];
@@ -1581,23 +1582,23 @@ function repModel(){
   if(d.sid==="all"){
     const all=[]; d.rows.forEach(r=>r.orders.forEach(o=>all.push({o,s:r.s})));
     all.sort((a,b)=>b.o.ts-a.o.ts);
-    tables.push({name:"", supLink:true, head:["ספק","שעה","תאריך","לפני מע״מ","כולל מע״מ"],
+    tables.push({name:"", supLink:true, head:["ספק","שעה","תאריך","כולל מע״מ"],
       meta:all.map(x=>({order:x.o, s:x.s, orders:[x.o], partial:x.o.total!=null && (x.o.items||[]).some(it=>it.price==null)})),
-      rows:all.map(x=>[supTitle(x.s), repTime([x.o]), repDates([x.o]), x.o.total!=null?money(x.o.total):"אין מחירים", x.o.total!=null?money(x.o.total*1.18):"אין מחירים"]),
-      total:["סה״כ", "", "", money(tot.sum), money(tot.sum*1.18)]});
+      rows:all.map(x=>[supTitle(x.s), repTime([x.o]), repDates([x.o]), x.o.total!=null?money(gv(x.o.total)):"אין מחירים"]),
+      total:["סה״כ", "", "", money(gv(tot.sum))]});
     if(d.byMonth){
       const byM={}; d.rows.forEach(r=>r.orders.forEach(o=>{ const k=mKey(o.ts); byM[k]=byM[k]||{n:0,sum:0}; byM[k].n++; if(o.total!=null) byM[k].sum+=o.total; }));
       const ks=Object.keys(byM).sort().reverse();
-      if(ks.length) tables.push({name:"לפי חודש", head:["חודש","הזמנות","לפני מע״מ","כולל מע״מ"], rows:ks.map(k=>[mLabel(k),String(byM[k].n),byM[k].sum?money(byM[k].sum):"—",byM[k].sum?money(byM[k].sum*1.18):"—"]), total:null});
+      if(ks.length) tables.push({name:"לפי חודש", head:["חודש","הזמנות","כולל מע״מ"], rows:ks.map(k=>[mLabel(k),String(byM[k].n),byM[k].sum?money(gv(byM[k].sum)):"—"]), total:null});
     }
   } else {
     const r=d.rows[0], byP={};
     r.orders.forEach(o=>(o.items||[]).forEach(it=>{ const x=byP[it.id]||(byP[it.id]={name:it.name,q:0,amt:0,priced:false}); x.name=it.name||x.name; x.q+=Number(it.q)||0; if(it.price!=null){ x.amt+=(Number(it.q)||0)*it.price; x.priced=true; } }));
     const ps=Object.values(byP).sort((a,b)=>b.amt-a.amt||b.q-a.q);
     const ords=r.orders.slice().reverse();
-    tables.push({name:"", head:["הזמנה","לפני מע״מ","כולל מע״מ"],
+    tables.push({name:"", head:["הזמנה","כולל מע״מ"],
       meta:ords.map(o=>({order:o, s:r.s, orders:[o], partial:o.total!=null && (o.items||[]).some(it=>it.price==null)})),
-      rows:ords.map(o=>{ const dt=new Date(o.ts); return [dt.toLocaleDateString("he-IL")+" "+fmtTime(dt), o.total!=null?money(o.total):"—", o.total!=null?money(o.total*1.18):"—"]; }), total:ords.length>1?["סה״כ",money(r.sum),money(r.sum*1.18)]:null});
+      rows:ords.map(o=>{ const dt=new Date(o.ts); return [dt.toLocaleDateString("he-IL")+" "+fmtTime(dt), o.total!=null?money(gv(o.total)):"—"]; }), total:ords.length>1?["סה״כ",money(gv(r.sum))]:null});
   }
   return {title, sub, n:tot.n, trend:trendTxt(tot.sum,tot.prev,tot.prevN), vsLabel:repPrev()[2], sum:tot.sum, unp:tot.unp, part:tot.part, tables};
 }
@@ -1605,7 +1606,7 @@ const trendCls=t=>t.startsWith("▲")?"up":t.startsWith("▼")?"down":"";
 function renderReport(){
   const m=repModel(), out=document.getElementById("repOut"); out.innerHTML="";
   const sum=document.createElement("div"); sum.className="rep-sum";
-  [[money(m.sum),"לפני מע״מ"],[money(m.sum*1.18),"כולל מע״מ"]].forEach(([v,l])=>{ const c=document.createElement("div"); const b=document.createElement("b"); b.textContent=v; const sp=document.createElement("span"); sp.textContent=l; c.append(b,sp); sum.appendChild(c); });
+  [[money(gv(m.sum)),"כולל מע״מ"]].forEach(([v,l])=>{ const c=document.createElement("div"); const b=document.createElement("b"); b.textContent=v; const sp=document.createElement("span"); sp.textContent=l; c.append(b,sp); sum.appendChild(c); });
   out.appendChild(sum);
   if(!m.n){ const e=document.createElement("div"); e.className="rep-empty"; e.textContent="אין הזמנות בתקופה הזו."; out.appendChild(e); }
   else m.tables.forEach(t=>{
@@ -1780,15 +1781,15 @@ function toggleOrder(tr,o,cols){
   (o.items||[]).forEach(it=>{
     const r=document.createElement("tr");
     const a=document.createElement("td"); a.textContent=it.name;
-    const b=document.createElement("td"); b.textContent = it.price!=null ? it.q+" × "+money(it.price) : it.q;
-    const c=document.createElement("td"); if(it.price!=null) c.textContent=money(it.q*it.price); else { c.textContent="חסר מחיר"; c.className="nop"; }
+    const b=document.createElement("td"); b.textContent = it.price!=null ? it.q+" × "+money(gv(it.price)) : it.q;
+    const c=document.createElement("td"); if(it.price!=null) c.textContent=money(gv(it.q*it.price)); else { c.textContent="חסר מחיר"; c.className="nop"; }
     r.append(a,b,c); t.appendChild(r);
   });
   td.appendChild(t);
   if(o.total!=null){
     const vat=Math.round(o.total*VAT*100)/100;
-    [["לפני מע״מ",o.total],["מע״מ 18%",vat],["כולל מע״מ",Math.round((o.total+vat)*100)/100]].forEach(([l,v],i)=>{
-      const row=document.createElement("div"); row.className="rep-dt"+(i===2?" g":"");
+    [["סה״כ כולל מע״מ",Math.round((o.total+vat)*100)/100]].forEach(([l,v],i)=>{
+      const row=document.createElement("div"); row.className="rep-dt g";
       const x=document.createElement("span"); x.textContent=l; const y=document.createElement("span"); y.textContent=money(v);
       row.append(x,y); td.appendChild(row);
     });
@@ -1889,12 +1890,12 @@ document.getElementById("plApply").addEventListener("click",()=>{
   plSay(nUp ? "עודכנו "+nUp+" מחירים · סניף "+branch().name : "אין שינוי במחירים","ok");
   render(); plRender();
 });
-// ---------- reports: how much of each supplier's monthly frame was used (before VAT), compared with other periods
+// ---------- reports: how much of each supplier's monthly frame was used (with VAT), compared with other periods
 const ANA_D=86400000;
 const anaSups=()=>repSups();
 const anaMStart=(y,m)=>new Date(y,m,1).getTime();
 const anaMLen=(y,m)=>new Date(y,m+1,1).getTime()-new Date(y,m,1).getTime();
-function anaSpend(s,a,b){ return load("hl_hist_"+dataKey(s),[]).reduce((t,o)=>o.total!=null && o.ts>=a && o.ts<b ? t+o.total : t,0); }
+function anaSpend(s,a,b){ return gv(load("hl_hist_"+dataKey(s),[]).reduce((t,o)=>o.total!=null && o.ts>=a && o.ts<b ? t+o.total : t,0)); }
 function anaSet(s){ const v=Number(load("hl_budget_"+dataKey(s),0)); return v>0?v:0; }
 // the frame of a month: the one set in settings, else the average of the 3 months before it that had orders
 function anaAuto(s,y,m){ const v=[]; for(let i=1;i<=3;i++){ const d=new Date(y,m-i,1), sp=anaSpend(s,d.getTime(),anaMStart(d.getFullYear(),d.getMonth()+1)); if(sp>0) v.push(sp); } return v.length? v.reduce((a,b)=>a+b,0)/v.length : 0; }
@@ -2019,7 +2020,7 @@ function renderAna(){
   // months
   const bs=anaBars(sups,y,m);
   h+='<div class="ana-card"><h3>'+(bs.amt?'הזמנות לפי חודשים':'ניצול לפי חודשים')+'</h3>'+bs.svg;
-  h+='<div class="ana-note">'+(bs.amt?'סכום ההזמנות לפני מע״מ. כשתהיה מסגרת יוצג כאן אחוז הניצול.':bs.avg!=null?'<b style="color:var(--accent)">ממוצע ניצול: '+anaPct(bs.avg)+'</b> (הקו המקווקו, '+bs.n+' חודשים מלאים)':'אין עדיין חודשים מלאים לממוצע')+'</div></div>';
+  h+='<div class="ana-note">'+(bs.amt?'סכום ההזמנות כולל מע״מ. כשתהיה מסגרת יוצג כאן אחוז הניצול.':bs.avg!=null?'<b style="color:var(--accent)">ממוצע ניצול: '+anaPct(bs.avg)+'</b> (הקו המקווקו, '+bs.n+' חודשים מלאים)':'אין עדיין חודשים מלאים לממוצע')+'</div></div>';
   // suppliers
   h+='<div class="ana-card"><h3>לפי ספק</h3>';
   const rows=sups.map(s=>{ const fm=anaFrameM(s,y,m), sp=anaSpend(s,a,b), pc=fm.v>0?sp/fm.v*100:null, mp=useP([s],mainR).pct; return {s,fm,sp,pc,mp,cp:supCmp(s),cn:anaCount([s],a,b)}; })
@@ -2082,7 +2083,7 @@ function repOpenSup(id){
 document.getElementById("setSecBtn").addEventListener("click",()=>showSettings("sec"));
 document.getElementById("setBack").addEventListener("click",()=>{ if(setPanel!=="main") showSettings("main"); else { pinOk=false; showHome(); } });
 // set when the site file (index.html) is built
-const APP_BUILD="21.11.2026 · 22:30";
+const APP_BUILD="24.11.2026 · 20:41";
 document.getElementById("appVer").textContent = APP_BUILD.startsWith("__") ? "גרסת תצוגה (קישור Claude)" : "עדכון אחרון של האפליקציה: "+APP_BUILD;
 function repPerUI(){ document.querySelectorAll("#repPer button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.p===repPeriod?"true":"false"));
   const box=document.getElementById("repRange"); box.hidden=repPeriod!=="custom";
@@ -2123,10 +2124,10 @@ document.getElementById("repPdf").addEventListener("click",async()=>{
     ctx.textAlign="left"; ctx.fillStyle=grey; ctx.font='400 26px "Assistant", sans-serif'; ctx.fillText("הופק "+new Date().toLocaleDateString("he-IL"),M,y); ctx.textAlign="right"; y+=30;
     ctx.fillStyle=green; ctx.fillRect(M,y,W-2*M,4); y+=60;
     ctx.fillStyle=ink; ctx.font='700 32px "Assistant", sans-serif';
-    ctx.fillText("לפני מע״מ "+money(m.sum)+"  ·  כולל מע״מ "+money(m.sum*1.18),W-M,y); y+=60;
+    ctx.fillText("סה״כ כולל מע״מ "+money(gv(m.sum)),W-M,y); y+=60;
     m.tables.forEach(t=>{
       if(!t.rows.length) return;
-      const nc=t.head.length, colW=nc===5?[0,110,150,200,200]:nc===4?[0,190,230,230]:[0,190,260];
+      const nc=t.head.length, colW=nc===5?[0,110,150,200,200]:nc===4?[0,130,170,260]:nc===3?[0,190,260]:[0,300];
       const xs=[]; let x=M; for(let i=nc-1;i>=1;i--){ xs[i]=x+colW[i]/2; x+=colW[i]; }
       const row=(cells,font,color)=>{ ctx.font=font; ctx.fillStyle=color; ctx.textAlign="right"; const nm=String(cells[0]); let tx=nm; while(ctx.measureText(tx).width>W-2*M-x+M-20 && tx.length>3) tx=tx.slice(0,-2); ctx.fillText(tx===nm?nm:tx+"…",W-M,y); ctx.textAlign="center"; for(let i=1;i<nc;i++) ctx.fillText(String(cells[i]),xs[i],y); ctx.textAlign="right"; };
       need(150); if(t.name){ ctx.fillStyle=green; ctx.font='38px "Secular One", "Assistant", sans-serif'; ctx.fillText(t.name,W-M,y); y+=48; }
@@ -2380,8 +2381,8 @@ function update(li,p,skip){
   if(!editing) li.querySelector(".order").textContent = o==null ? "–" : o;
   const pr=li.querySelector(".price");
   if(pr){
-    pr.textContent=money(p.price)+" "+tr().perUnit;
-    if(o>0){ const ln=document.createElement("span"); ln.className="line"; ln.textContent=money(p.price*o); pr.appendChild(ln); }
+    pr.textContent=money(gv(p.price))+" "+tr().perUnit;
+    if(o>0){ const ln=document.createElement("span"); ln.className="line"; ln.textContent=money(gv(p.price*o)); pr.appendChild(ln); }
   }
   li.classList.toggle("has-order", o>0);
   if(!skip) summary();
@@ -2394,7 +2395,7 @@ function summary(){
   document.getElementById("pdfBtn").disabled = n===0 && unmarked().length===0;
   const tb=document.getElementById("totalBox"), tn=document.getElementById("totalNote");
   if(hasPrices(cur)){
-    const {sum,noPrice}=totalOf(cur), el=document.getElementById("totalSum"), txt=money(sum);
+    const {sum,noPrice}=totalOf(cur), el=document.getElementById("totalSum"), txt=money(gv(sum));
     tb.hidden=false;
     if(el.textContent!==txt){ el.textContent=txt; el.classList.remove("bump"); void el.offsetWidth; el.classList.add("bump"); }
     tn.hidden=noPrice===0; tn.textContent=noPrice?tr().noPriceN(noPrice):"";
@@ -2566,7 +2567,7 @@ function showHistory(){
       const sm=document.createElement("div"); sm.className="msum";
       if(m.priced){
         const t=Math.round(m.t*100)/100, v=Math.round(t*VAT*100)/100;
-        const [l1,l2]=tr().monthSoFar(m.n,t,Math.round((t+v)*100)/100);
+        const [l1,l2]=tr().monthSoFar(m.n,Math.round((t+v)*100)/100);
         const a=document.createElement("div"); a.textContent=l1+(m.partial?" · "+tr().notFinalShort:""); const c=document.createElement("div"); c.className="msub"; c.textContent=l2;
         sm.append(a,c);
       } else sm.textContent=tr().monthCount(m.n);
@@ -2577,7 +2578,7 @@ function showHistory(){
     const w=document.createElement("span"); w.className="when";
     w.textContent=new Date(o.ts).toLocaleString(tr().locale,{weekday:"short",day:"numeric",month:"numeric",year:"2-digit",hour:"2-digit",minute:"2-digit"});
     const n=document.createElement("span"); n.className="n"; const part=partialOf(o);
-    n.textContent = part ? tr().notFinalShort : tr().histCount(o.items.length)+(o.total!=null?" · "+money(o.total):" · "+tr().noPricesShort);
+    n.textContent = part ? tr().notFinalShort : tr().histCount(o.items.length)+(o.total!=null?" · "+money(gv(o.total)):" · "+tr().noPricesShort);
     if(part||o.total==null) n.classList.add("partial");
     const c=document.createElement("span"); c.className="chev"; c.textContent="▾";
     sm.append(w,n,c); d.appendChild(sm);
@@ -2586,17 +2587,17 @@ function showHistory(){
       const li=document.createElement("li");
       const nm=document.createElement("span"); nm.className="hn"; nm.textContent=byId[it.id]?pname(byId[it.id]):it.name;
       const unit = it.price!=null ? it.price : null;
-      if(unit!=null){ const up=document.createElement("small"); up.textContent=it.q+" × "+money(unit); nm.appendChild(up); }
+      if(unit!=null){ const up=document.createElement("small"); up.textContent=it.q+" × "+money(gv(unit)); nm.appendChild(up); }
       else if(o.total!=null){ const up=document.createElement("small"); up.className="nop"; up.textContent=tr().noPrice; nm.appendChild(up); }
       const q=document.createElement("b");
-      q.textContent = unit!=null ? money(unit*it.q) : it.q;
+      q.textContent = unit!=null ? money(gv(unit*it.q)) : it.q;
       li.append(nm,q); ul.appendChild(li);
     });
     d.appendChild(ul);
     if(o.total!=null){
       const vat=Math.round(o.total*VAT*100)/100;
       if(part){ const pn=document.createElement("div"); pn.className="hpart"; pn.textContent=tr().noPriceN(o.items.filter(it=>it.price==null).length); d.appendChild(pn); }
-      [[part?tr().notFinal:tr().histTotal,o.total,part?"part":""],[tr().vatLbl,vat,"sub"],[tr().grandLbl,Math.round((o.total+vat)*100)/100,"grand"]].forEach(([lbl,val,cls])=>{
+      [[part?tr().notFinal:tr().grandLbl,Math.round((o.total+vat)*100)/100,part?"part grand":"grand"]].forEach(([lbl,val,cls])=>{
         const tt=document.createElement("div"); tt.className="tot "+cls;
         const a=document.createElement("span"); a.textContent=lbl;
         const b=document.createElement("span"); b.textContent=money(val);
